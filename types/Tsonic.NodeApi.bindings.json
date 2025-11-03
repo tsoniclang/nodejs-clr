@@ -25,6 +25,11 @@
       "kind": "module",
       "assembly": "Tsonic.NodeApi",
       "type": "Tsonic.NodeApi.os"
+    },
+    "util": {
+      "kind": "module",
+      "assembly": "Tsonic.NodeApi",
+      "type": "Tsonic.NodeApi.util"
     }
   }
 }
