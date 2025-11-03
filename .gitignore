@@ -57,9 +57,12 @@ nunit-*.xml
 .vscode/
 
 # Working directories (see CLAUDE.md)
-.tests/          # Test run output capture
-.analysis/       # Research and documentation artifacts
-.todos/          # Persistent task tracking
+.tests/
+.analysis/
+.todos/
+
+# Node.js
+node_modules/
 
 # Test outputs
 tests/**/TestResults/
