@@ -1,3 +1,4 @@
-/// <reference path="./path.d.ts" />
-/// <reference path="./fs.d.ts" />
-/// <reference path="./events-simple.d.ts" />
+export * from "./path.js";
+export * from "./fs.js";
+export * from "./events-simple.js";
+export * from "./process.js";

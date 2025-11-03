@@ -15,6 +15,11 @@
       "assembly": "Tsonic.NodeApi",
       "type": "Tsonic.NodeApi.EventEmitter",
       "default": "Tsonic.NodeApi.EventEmitter"
+    },
+    "process": {
+      "kind": "module",
+      "assembly": "Tsonic.NodeApi",
+      "type": "Tsonic.NodeApi.process"
     }
   }
 }

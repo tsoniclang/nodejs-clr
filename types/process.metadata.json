@@ -1,0 +1,98 @@
+{
+  "assemblyName": "Tsonic.NodeApi",
+  "types": {
+    "Tsonic.NodeApi.process": {
+      "kind": "class",
+      "isStatic": true,
+      "members": {
+        "argv": {
+          "kind": "property",
+          "isStatic": true
+        },
+        "argv0": {
+          "kind": "property",
+          "isStatic": true
+        },
+        "env": {
+          "kind": "property",
+          "isStatic": true
+        },
+        "platform": {
+          "kind": "property",
+          "isStatic": true
+        },
+        "arch": {
+          "kind": "property",
+          "isStatic": true
+        },
+        "version": {
+          "kind": "property",
+          "isStatic": true
+        },
+        "versions": {
+          "kind": "property",
+          "isStatic": true
+        },
+        "execPath": {
+          "kind": "property",
+          "isStatic": true
+        },
+        "pid": {
+          "kind": "property",
+          "isStatic": true
+        },
+        "ppid": {
+          "kind": "property",
+          "isStatic": true
+        },
+        "exitCode": {
+          "kind": "property",
+          "isStatic": true
+        },
+        "cwd()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "chdir(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "exit(int?)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "kill(int,object?)": {
+          "kind": "method",
+          "isStatic": true
+        }
+      }
+    },
+    "Tsonic.NodeApi.ProcessEnv": {
+      "kind": "class",
+      "isStatic": false,
+      "members": {}
+    },
+    "Tsonic.NodeApi.ProcessVersions": {
+      "kind": "class",
+      "isStatic": false,
+      "members": {
+        "node": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "v8": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "dotnet": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "tsonic": {
+          "kind": "property",
+          "isStatic": false
+        }
+      }
+    }
+  }
+}
