@@ -1,0 +1,97 @@
+{
+  "assemblyName": "Tsonic.NodeApi",
+  "types": {
+    "Tsonic.NodeApi.AssertionError": {
+      "kind": "class",
+      "isStatic": false,
+      "members": {
+        "actual": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "expected": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "operator": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "generatedMessage": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "code": {
+          "kind": "property",
+          "isStatic": false
+        }
+      }
+    },
+    "Tsonic.NodeApi.assert": {
+      "kind": "class",
+      "isStatic": true,
+      "members": {
+        "ok(bool,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "fail(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "equal(object,object,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "notEqual(object,object,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "strictEqual(object,object,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "notStrictEqual(object,object,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "deepEqual(object,object,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "notDeepEqual(object,object,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "deepStrictEqual(object,object,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "notDeepStrictEqual(object,object,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "throws(Action,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "doesNotThrow(Action,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "match(string,Regex,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "doesNotMatch(string,Regex,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "ifError(object)": {
+          "kind": "method",
+          "isStatic": true
+        }
+      }
+    }
+  }
+}

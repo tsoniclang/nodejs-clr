@@ -36,6 +36,22 @@
       "assembly": "Tsonic.NodeApi",
       "type": "Tsonic.NodeApi.Buffer",
       "default": "Tsonic.NodeApi.Buffer"
+    },
+    "timers": {
+      "kind": "module",
+      "assembly": "Tsonic.NodeApi",
+      "type": "Tsonic.NodeApi.timers"
+    },
+    "assert": {
+      "kind": "module",
+      "assembly": "Tsonic.NodeApi",
+      "type": "Tsonic.NodeApi.assert"
+    },
+    "url": {
+      "kind": "module",
+      "assembly": "Tsonic.NodeApi",
+      "type": "Tsonic.NodeApi.URL",
+      "default": "Tsonic.NodeApi.URL"
     }
   }
 }
