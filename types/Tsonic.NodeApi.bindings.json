@@ -20,6 +20,11 @@
       "kind": "module",
       "assembly": "Tsonic.NodeApi",
       "type": "Tsonic.NodeApi.process"
+    },
+    "os": {
+      "kind": "module",
+      "assembly": "Tsonic.NodeApi",
+      "type": "Tsonic.NodeApi.os"
     }
   }
 }

@@ -1,0 +1,149 @@
+{
+  "assemblyName": "Tsonic.NodeApi",
+  "types": {
+    "Tsonic.NodeApi.os": {
+      "kind": "class",
+      "isStatic": true,
+      "members": {
+        "hostname()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "loadavg()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "uptime()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "freemem()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "totalmem()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "cpus()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "availableParallelism()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "type()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "release()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "homedir()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "userInfo()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "tmpdir()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "endianness()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "arch()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "platform()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "EOL": {
+          "kind": "property",
+          "isStatic": true
+        },
+        "devNull": {
+          "kind": "property",
+          "isStatic": true
+        }
+      }
+    },
+    "Tsonic.NodeApi.CpuInfo": {
+      "kind": "class",
+      "isStatic": false,
+      "members": {
+        "model": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "speed": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "times": {
+          "kind": "property",
+          "isStatic": false
+        }
+      }
+    },
+    "Tsonic.NodeApi.CpuTimes": {
+      "kind": "class",
+      "isStatic": false,
+      "members": {
+        "user": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "nice": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "sys": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "idle": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "irq": {
+          "kind": "property",
+          "isStatic": false
+        }
+      }
+    },
+    "Tsonic.NodeApi.UserInfo": {
+      "kind": "class",
+      "isStatic": false,
+      "members": {
+        "username": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "uid": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "gid": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "shell": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "homedir": {
+          "kind": "property",
+          "isStatic": false
+        }
+      }
+    }
+  }
+}
