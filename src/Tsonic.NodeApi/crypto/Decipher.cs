@@ -10,17 +10,38 @@ namespace Tsonic.NodeApi;
 /// </summary>
 public class Decipher : Transform
 {
-    private readonly ICryptoTransform _decryptor;
-    private readonly MemoryStream _memoryStream;
-    private readonly CryptoStream _cryptoStream;
+    private readonly ICryptoTransform? _decryptor;
+    private readonly MemoryStream? _memoryStream;
+    private readonly CryptoStream? _cryptoStream;
     private bool _finalized = false;
+
+    // GCM mode fields
+    private readonly bool _isGcmMode = false;
+    private readonly byte[]? _gcmKey;
+    private readonly byte[]? _gcmNonce;
+    private byte[]? _gcmAad;
+    private byte[]? _gcmTag;
+    private readonly MemoryStream? _gcmDataBuffer;
 
     internal Decipher(string algorithm, byte[] key, byte[]? iv)
     {
-        var (cipher, transform) = CreateDecipher(algorithm, key, iv);
-        _decryptor = transform;
-        _memoryStream = new MemoryStream();
-        _cryptoStream = new CryptoStream(_memoryStream, _decryptor, CryptoStreamMode.Write);
+        var alg = algorithm.ToLowerInvariant();
+
+        // Check if GCM mode
+        if (alg.Contains("-gcm"))
+        {
+            _isGcmMode = true;
+            _gcmKey = key;
+            _gcmNonce = iv ?? throw new ArgumentNullException(nameof(iv), "GCM mode requires nonce/IV");
+            _gcmDataBuffer = new MemoryStream();
+        }
+        else
+        {
+            var (cipher, transform) = CreateDecipher(algorithm, key, iv);
+            _decryptor = transform;
+            _memoryStream = new MemoryStream();
+            _cryptoStream = new CryptoStream(_memoryStream, _decryptor, CryptoStreamMode.Write);
+        }
     }
 
     /// <summary>
@@ -61,8 +82,15 @@ public class Decipher : Transform
         if (_finalized)
             throw new InvalidOperationException("Decipher already finalized");
 
-        _cryptoStream.Write(data, 0, data.Length);
-        var decrypted = _memoryStream.ToArray();
+        if (_isGcmMode)
+        {
+            // GCM mode: buffer data until final()
+            _gcmDataBuffer!.Write(data, 0, data.Length);
+            return ""; // GCM returns empty string on update
+        }
+
+        _cryptoStream!.Write(data, 0, data.Length);
+        var decrypted = _memoryStream!.ToArray();
         _memoryStream.SetLength(0);
 
         var outEnc = (outputEncoding ?? "utf8").ToLowerInvariant();
@@ -85,12 +113,7 @@ public class Decipher : Transform
     /// <returns>The remaining decrypted data.</returns>
     public string final(string? outputEncoding = null)
     {
-        if (_finalized)
-            throw new InvalidOperationException("Decipher already finalized");
-
-        _finalized = true;
-        _cryptoStream.FlushFinalBlock();
-        var decrypted = _memoryStream.ToArray();
+        var decrypted = final();
 
         var outEnc = (outputEncoding ?? "utf8").ToLowerInvariant();
         return outEnc switch
@@ -115,8 +138,24 @@ public class Decipher : Transform
             throw new InvalidOperationException("Decipher already finalized");
 
         _finalized = true;
-        _cryptoStream.FlushFinalBlock();
-        return _memoryStream.ToArray();
+
+        if (_isGcmMode)
+        {
+            // GCM decryption
+            if (_gcmTag == null)
+                throw new InvalidOperationException("Must call setAuthTag() before final() for GCM mode");
+
+            var ciphertext = _gcmDataBuffer!.ToArray();
+            var plaintext = new byte[ciphertext.Length];
+
+            using var aesGcm = new AesGcm(_gcmKey!, AesGcm.TagByteSizes.MaxSize);
+            aesGcm.Decrypt(_gcmNonce!, ciphertext, _gcmTag, plaintext, _gcmAad);
+
+            return plaintext;
+        }
+
+        _cryptoStream!.FlushFinalBlock();
+        return _memoryStream!.ToArray();
     }
 
     /// <summary>
@@ -125,7 +164,13 @@ public class Decipher : Transform
     /// <param name="buffer">The authentication tag.</param>
     public void setAuthTag(byte[] buffer)
     {
-        throw new NotImplementedException("setAuthTag is not yet implemented for non-GCM modes");
+        if (!_isGcmMode)
+            throw new NotImplementedException("setAuthTag is only supported for GCM modes");
+
+        if (_finalized)
+            throw new InvalidOperationException("Cannot set auth tag after finalization");
+
+        _gcmTag = buffer;
     }
 
     /// <summary>
@@ -134,7 +179,13 @@ public class Decipher : Transform
     /// <param name="buffer">The AAD data.</param>
     public void setAAD(byte[] buffer)
     {
-        throw new NotImplementedException("setAAD is not yet implemented for non-GCM modes");
+        if (!_isGcmMode)
+            throw new NotImplementedException("setAAD is only supported for GCM modes");
+
+        if (_finalized)
+            throw new InvalidOperationException("Cannot set AAD after finalization");
+
+        _gcmAad = buffer;
     }
 
 #pragma warning disable CS1591
@@ -156,6 +207,7 @@ public class Decipher : Transform
             _cryptoStream?.Dispose();
             _memoryStream?.Dispose();
             _decryptor?.Dispose();
+            _gcmDataBuffer?.Dispose();
         }
     }
 #pragma warning restore CS1591
@@ -174,7 +226,11 @@ public class Decipher : Transform
             else if (alg.Contains("-cbc")) aes.Mode = CipherMode.CBC;
             else if (alg.Contains("-cfb")) aes.Mode = CipherMode.CFB;
             else if (alg.Contains("-ctr")) aes.Mode = CipherMode.ECB; // CTR not directly supported
-            else if (alg.Contains("-gcm")) throw new NotImplementedException("AES-GCM mode requires special handling");
+            else if (alg.Contains("-gcm"))
+            {
+                // GCM mode is handled separately in constructor, should not reach here
+                throw new InvalidOperationException("GCM mode should be handled in constructor");
+            }
             else aes.Mode = CipherMode.CBC; // default
 
             aes.Padding = PaddingMode.PKCS7;

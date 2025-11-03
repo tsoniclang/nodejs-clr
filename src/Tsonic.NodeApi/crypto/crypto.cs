@@ -713,9 +713,8 @@ public static partial class crypto
     /// </summary>
     public static byte[] hkdfSync(string digest, byte[] ikm, byte[] salt, byte[] info, int keylen)
     {
-        // HKDF is not directly available in .NET Framework/Standard
-        // Would need to implement RFC 5869
-        throw new NotImplementedException("hkdfSync is not yet implemented");
+        var hashAlgorithm = GetHashAlgorithmName(digest);
+        return HKDF.DeriveKey(hashAlgorithm, ikm, keylen, salt, info);
     }
 
     /// <summary>

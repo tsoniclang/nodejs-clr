@@ -9,17 +9,38 @@ namespace Tsonic.NodeApi;
 /// </summary>
 public class Cipher : Transform
 {
-    private readonly ICryptoTransform _encryptor;
-    private readonly MemoryStream _memoryStream;
-    private readonly CryptoStream _cryptoStream;
+    private readonly ICryptoTransform? _encryptor;
+    private readonly MemoryStream? _memoryStream;
+    private readonly CryptoStream? _cryptoStream;
     private bool _finalized = false;
+
+    // GCM mode fields
+    private readonly bool _isGcmMode = false;
+    private readonly byte[]? _gcmKey;
+    private readonly byte[]? _gcmNonce;
+    private byte[]? _gcmAad;
+    private byte[]? _gcmTag;
+    private readonly MemoryStream? _gcmDataBuffer;
 
     internal Cipher(string algorithm, byte[] key, byte[]? iv)
     {
-        var (cipher, transform) = CreateCipher(algorithm, key, iv);
-        _encryptor = transform;
-        _memoryStream = new MemoryStream();
-        _cryptoStream = new CryptoStream(_memoryStream, _encryptor, CryptoStreamMode.Write);
+        var alg = algorithm.ToLowerInvariant();
+
+        // Check if GCM mode
+        if (alg.Contains("-gcm"))
+        {
+            _isGcmMode = true;
+            _gcmKey = key;
+            _gcmNonce = iv ?? throw new ArgumentNullException(nameof(iv), "GCM mode requires nonce/IV");
+            _gcmDataBuffer = new MemoryStream();
+        }
+        else
+        {
+            var (cipher, transform) = CreateCipher(algorithm, key, iv);
+            _encryptor = transform;
+            _memoryStream = new MemoryStream();
+            _cryptoStream = new CryptoStream(_memoryStream, _encryptor, CryptoStreamMode.Write);
+        }
     }
 
     /// <summary>
@@ -50,8 +71,15 @@ public class Cipher : Transform
         if (_finalized)
             throw new InvalidOperationException("Cipher already finalized");
 
-        _cryptoStream.Write(data, 0, data.Length);
-        var encrypted = _memoryStream.ToArray();
+        if (_isGcmMode)
+        {
+            // GCM mode: buffer data until final()
+            _gcmDataBuffer!.Write(data, 0, data.Length);
+            return ""; // GCM returns empty string on update
+        }
+
+        _cryptoStream!.Write(data, 0, data.Length);
+        var encrypted = _memoryStream!.ToArray();
         _memoryStream.SetLength(0);
 
         if (outputEncoding == null || outputEncoding == "buffer")
@@ -76,12 +104,7 @@ public class Cipher : Transform
     /// <returns>The remaining encrypted data.</returns>
     public string final(string? outputEncoding = null)
     {
-        if (_finalized)
-            throw new InvalidOperationException("Cipher already finalized");
-
-        _finalized = true;
-        _cryptoStream.FlushFinalBlock();
-        var encrypted = _memoryStream.ToArray();
+        var encrypted = final();
 
         if (outputEncoding == null || outputEncoding == "buffer")
         {
@@ -108,8 +131,22 @@ public class Cipher : Transform
             throw new InvalidOperationException("Cipher already finalized");
 
         _finalized = true;
-        _cryptoStream.FlushFinalBlock();
-        return _memoryStream.ToArray();
+
+        if (_isGcmMode)
+        {
+            // GCM encryption
+            var plaintext = _gcmDataBuffer!.ToArray();
+            var ciphertext = new byte[plaintext.Length];
+            _gcmTag = new byte[16]; // AES-GCM uses 128-bit (16 byte) tag
+
+            using var aesGcm = new AesGcm(_gcmKey!, AesGcm.TagByteSizes.MaxSize);
+            aesGcm.Encrypt(_gcmNonce!, plaintext, ciphertext, _gcmTag, _gcmAad);
+
+            return ciphertext;
+        }
+
+        _cryptoStream!.FlushFinalBlock();
+        return _memoryStream!.ToArray();
     }
 
     /// <summary>
@@ -118,7 +155,10 @@ public class Cipher : Transform
     /// <param name="tagLength">The tag length in bytes.</param>
     public void setAuthTag(int tagLength)
     {
-        throw new NotImplementedException("setAuthTag is not yet implemented for non-GCM modes");
+        if (!_isGcmMode)
+            throw new NotImplementedException("setAuthTag is only supported for GCM modes");
+
+        // Note: AesGcm always uses 16-byte tag, but this method is here for API compatibility
     }
 
     /// <summary>
@@ -127,7 +167,16 @@ public class Cipher : Transform
     /// <returns>The authentication tag.</returns>
     public byte[] getAuthTag()
     {
-        throw new NotImplementedException("getAuthTag is not yet implemented for non-GCM modes");
+        if (!_isGcmMode)
+            throw new NotImplementedException("getAuthTag is only supported for GCM modes");
+
+        if (!_finalized)
+            throw new InvalidOperationException("Must call final() before getAuthTag()");
+
+        if (_gcmTag == null)
+            throw new InvalidOperationException("No auth tag available");
+
+        return _gcmTag;
     }
 
     /// <summary>
@@ -136,7 +185,13 @@ public class Cipher : Transform
     /// <param name="buffer">The AAD data.</param>
     public void setAAD(byte[] buffer)
     {
-        throw new NotImplementedException("setAAD is not yet implemented for non-GCM modes");
+        if (!_isGcmMode)
+            throw new NotImplementedException("setAAD is only supported for GCM modes");
+
+        if (_finalized)
+            throw new InvalidOperationException("Cannot set AAD after finalization");
+
+        _gcmAad = buffer;
     }
 
 #pragma warning disable CS1591
@@ -158,6 +213,7 @@ public class Cipher : Transform
             _cryptoStream?.Dispose();
             _memoryStream?.Dispose();
             _encryptor?.Dispose();
+            _gcmDataBuffer?.Dispose();
         }
     }
 #pragma warning restore CS1591
@@ -177,7 +233,11 @@ public class Cipher : Transform
             else if (alg.Contains("-cbc")) aes.Mode = CipherMode.CBC;
             else if (alg.Contains("-cfb")) aes.Mode = CipherMode.CFB;
             else if (alg.Contains("-ctr")) aes.Mode = CipherMode.ECB; // CTR not directly supported
-            else if (alg.Contains("-gcm")) throw new NotImplementedException("AES-GCM mode requires special handling");
+            else if (alg.Contains("-gcm"))
+            {
+                // GCM mode is handled separately in constructor, should not reach here
+                throw new InvalidOperationException("GCM mode should be handled in constructor");
+            }
             else aes.Mode = CipherMode.CBC; // default
 
             aes.Padding = PaddingMode.PKCS7;
