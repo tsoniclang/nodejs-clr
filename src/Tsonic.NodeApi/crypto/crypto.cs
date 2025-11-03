@@ -538,13 +538,25 @@ public static partial class crypto
         {
             "hex" => Convert.FromHexString(key.Replace("-", "")),
             "base64" => Convert.FromBase64String(key),
-            "base64url" => Convert.FromBase64String(key.Replace("-", "+").Replace("_", "/")),
+            "base64url" => DecodeBase64Url(key),
             "utf8" or "utf-8" => Encoding.UTF8.GetBytes(key),
             "ascii" => Encoding.ASCII.GetBytes(key),
             "latin1" or "binary" => Encoding.Latin1.GetBytes(key),
             _ => Encoding.UTF8.GetBytes(key)
         };
         return new SecretKeyObject(keyBytes);
+    }
+
+    private static byte[] DecodeBase64Url(string base64url)
+    {
+        var base64 = base64url.Replace("-", "+").Replace("_", "/");
+        // Add padding
+        switch (base64.Length % 4)
+        {
+            case 2: base64 += "=="; break;
+            case 3: base64 += "="; break;
+        }
+        return Convert.FromBase64String(base64);
     }
 
     /// <summary>

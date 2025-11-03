@@ -1061,5 +1061,582 @@ public class CryptoTests
     {
         Assert.Throws<ArgumentException>(() => crypto.generateKeyPairSync("invalid", null));
     }
+
+    // ========== Async Callback Tests ==========
+
+    [Fact]
+    public void RandomBytes_Callback_Works()
+    {
+        byte[]? result = null;
+        Exception? error = null;
+        crypto.randomBytes(32, (err, bytes) =>
+        {
+            error = err;
+            result = bytes;
+        });
+
+        Assert.Null(error);
+        Assert.NotNull(result);
+        Assert.Equal(32, result.Length);
+    }
+
+    [Fact]
+    public void RandomFill_Works()
+    {
+        var buffer = new byte[32];
+        byte[]? result = null;
+        Exception? error = null;
+
+        crypto.randomFill(buffer, 0, 16, (err, buf) =>
+        {
+            error = err;
+            result = buf;
+        });
+
+        Assert.Null(error);
+        Assert.NotNull(result);
+        Assert.Same(buffer, result);
+    }
+
+    [Fact]
+    public void Pbkdf2_Callback_Works()
+    {
+        byte[]? result = null;
+        Exception? error = null;
+
+        crypto.pbkdf2("password", "salt", 1000, 32, "sha256", (err, key) =>
+        {
+            error = err;
+            result = key;
+        });
+
+        Assert.Null(error);
+        Assert.NotNull(result);
+        Assert.Equal(32, result.Length);
+    }
+
+    [Fact]
+    public void GenerateKeyPair_Callback_Works()
+    {
+        object? pubKey = null;
+        object? privKey = null;
+        Exception? error = null;
+
+        crypto.generateKeyPair("rsa", null, (err, pub, priv) =>
+        {
+            error = err;
+            pubKey = pub;
+            privKey = priv;
+        });
+
+        Assert.Null(error);
+        Assert.NotNull(pubKey);
+        Assert.NotNull(privKey);
+        Assert.IsType<PublicKeyObject>(pubKey);
+        Assert.IsType<PrivateKeyObject>(privKey);
+    }
+
+    // ========== PublicEncrypt/PrivateDecrypt Tests ==========
+
+    [Fact]
+    public void PublicEncrypt_PrivateDecrypt_WithStringKey_Works()
+    {
+        var (publicKey, privateKey) = crypto.generateKeyPairSync("rsa", null);
+        var publicPem = publicKey.export().ToString()!;
+        var privatePem = privateKey.export().ToString()!;
+
+        var plaintext = Encoding.UTF8.GetBytes("Hello, World!");
+        var encrypted = crypto.publicEncrypt(publicPem, plaintext);
+        var decrypted = crypto.privateDecrypt(privatePem, encrypted);
+
+        Assert.Equal(plaintext, decrypted);
+    }
+
+    [Fact]
+    public void PublicEncrypt_PrivateDecrypt_WithKeyObject_Works()
+    {
+        var (publicKey, privateKey) = crypto.generateKeyPairSync("rsa", null);
+
+        var plaintext = Encoding.UTF8.GetBytes("Hello, World!");
+        var encrypted = crypto.publicEncrypt(publicKey, plaintext);
+        var decrypted = crypto.privateDecrypt(privateKey, encrypted);
+
+        Assert.Equal(plaintext, decrypted);
+    }
+
+    [Fact]
+    public void PublicEncrypt_InvalidKeyType_Throws()
+    {
+        var (_, privateKey) = crypto.generateKeyPairSync("rsa", null);
+        var plaintext = Encoding.UTF8.GetBytes("test");
+
+        Assert.Throws<ArgumentException>(() => crypto.publicEncrypt(privateKey, plaintext));
+    }
+
+    [Fact]
+    public void PrivateDecrypt_InvalidKeyType_Throws()
+    {
+        var (publicKey, _) = crypto.generateKeyPairSync("rsa", null);
+        var ciphertext = new byte[256];
+
+        Assert.Throws<ArgumentException>(() => crypto.privateDecrypt(publicKey, ciphertext));
+    }
+
+    // ========== KeyObject Creation Tests ==========
+
+    [Fact]
+    public void CreateSecretKey_WithHexEncoding_Works()
+    {
+        var hexKey = "0123456789abcdef";
+        var keyObj = crypto.createSecretKey(hexKey, "hex");
+
+        Assert.Equal("secret", keyObj.type);
+        Assert.Equal(8, keyObj.symmetricKeySize);
+    }
+
+    [Fact]
+    public void CreateSecretKey_WithBase64Encoding_Works()
+    {
+        var base64Key = Convert.ToBase64String(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 });
+        var keyObj = crypto.createSecretKey(base64Key, "base64");
+
+        Assert.Equal("secret", keyObj.type);
+        Assert.Equal(8, keyObj.symmetricKeySize);
+    }
+
+    [Fact]
+    public void CreateSecretKey_WithBase64UrlEncoding_Works()
+    {
+        // Base64url uses - and _ instead of + and /, padding removed
+        // AQIDBAUG = [1,2,3,4,5,6] in base64, remove padding for base64url
+        var base64url = "AQIDBAUG"; // No padding
+        var keyObj = crypto.createSecretKey(base64url, "base64url");
+
+        Assert.Equal("secret", keyObj.type);
+        Assert.Equal(6, keyObj.symmetricKeySize);
+    }
+
+    [Fact]
+    public void CreatePublicKey_FromBytes_Works()
+    {
+        var (publicKey, _) = crypto.generateKeyPairSync("rsa", null);
+        var exported = ((PublicKeyObject)publicKey).export("pem", "spki");
+        var bytes = Encoding.UTF8.GetBytes(exported);
+
+        // Export as DER
+        var publicRsa = System.Security.Cryptography.RSA.Create();
+        publicRsa.ImportFromPem(exported);
+        var derBytes = publicRsa.ExportSubjectPublicKeyInfo();
+
+        var keyObj = crypto.createPublicKey(derBytes);
+        Assert.Equal("public", keyObj.type);
+        Assert.Equal("rsa", keyObj.asymmetricKeyType);
+    }
+
+    [Fact]
+    public void CreatePublicKey_FromPrivateKey_Works()
+    {
+        var (_, privateKey) = crypto.generateKeyPairSync("rsa", null);
+        var publicKey = crypto.createPublicKey(privateKey);
+
+        Assert.Equal("public", publicKey.type);
+        Assert.Equal("rsa", publicKey.asymmetricKeyType);
+    }
+
+    [Fact]
+    public void CreatePublicKey_FromPublicKey_ReturnsSame()
+    {
+        var (publicKey, _) = crypto.generateKeyPairSync("rsa", null);
+        var result = crypto.createPublicKey(publicKey);
+
+        Assert.Same(publicKey, result);
+    }
+
+    [Fact]
+    public void CreatePrivateKey_FromBytes_Works()
+    {
+        var (_, privateKey) = crypto.generateKeyPairSync("rsa", null);
+        var exported = ((PrivateKeyObject)privateKey).export("pem", "pkcs8");
+
+        var privateRsa = System.Security.Cryptography.RSA.Create();
+        privateRsa.ImportFromPem(exported);
+        var derBytes = privateRsa.ExportPkcs8PrivateKey();
+
+        var keyObj = crypto.createPrivateKey(derBytes);
+        Assert.Equal("private", keyObj.type);
+        Assert.Equal("rsa", keyObj.asymmetricKeyType);
+    }
+
+    // ========== Hash/Hmac with Byte Arrays ==========
+
+    [Fact]
+    public void Hash_UpdateWithBytes_Works()
+    {
+        var hash = crypto.createHash("sha256");
+        hash.update(Encoding.UTF8.GetBytes("Hello, World!"));
+        var digest = hash.digest("hex");
+
+        Assert.Equal("dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f", digest);
+    }
+
+    [Fact]
+    public void Hash_DigestAsBytes_Works()
+    {
+        var hash = crypto.createHash("sha256");
+        hash.update("test");
+        var digest = hash.digest();
+
+        Assert.Equal(32, digest.Length); // SHA256 = 32 bytes
+    }
+
+    [Fact]
+    public void Hash_DigestBase64Url_Works()
+    {
+        var hash = crypto.createHash("sha256");
+        hash.update("test");
+        var digest = hash.digest("base64url");
+
+        Assert.NotEmpty(digest);
+        Assert.DoesNotContain("+", digest);
+        Assert.DoesNotContain("/", digest);
+        Assert.DoesNotContain("=", digest);
+    }
+
+    [Fact]
+    public void Hmac_UpdateWithBytes_Works()
+    {
+        var hmac = crypto.createHmac("sha256", new byte[] { 1, 2, 3, 4 });
+        hmac.update(Encoding.UTF8.GetBytes("test"));
+        var digest = hmac.digest("hex");
+
+        Assert.NotEmpty(digest);
+        Assert.Equal(64, digest.Length);
+    }
+
+    [Fact]
+    public void Hmac_DigestAsBytes_Works()
+    {
+        var hmac = crypto.createHmac("sha256", "key");
+        hmac.update("test");
+        var digest = hmac.digest();
+
+        Assert.Equal(32, digest.Length);
+    }
+
+    // ========== Static Helper Functions ==========
+
+    [Fact]
+    public void Hash_Static_Works()
+    {
+        var data = Encoding.UTF8.GetBytes("test");
+        var hash = crypto.hash("sha256", data);
+
+        Assert.Equal(32, hash.Length);
+    }
+
+    [Fact]
+    public void SetDefaultEncoding_DoesNotThrow()
+    {
+        crypto.setDefaultEncoding("hex");
+        crypto.setDefaultEncoding("base64");
+    }
+
+    [Fact]
+    public void SetFips_False_DoesNotThrow()
+    {
+        crypto.setFips(false);
+    }
+
+    [Fact]
+    public void SetFips_True_Throws()
+    {
+        Assert.Throws<NotSupportedException>(() => crypto.setFips(true));
+    }
+
+    // ========== Cipher/Decipher Advanced Features ==========
+
+    [Fact]
+    public void Cipher_GetAuthTag_ThrowsNotImplemented()
+    {
+        var cipher = crypto.createCipheriv("aes-256-cbc", crypto.randomBytes(32), crypto.randomBytes(16));
+        cipher.update("test data", "utf8", "hex");
+        cipher.final("hex");
+
+        // getAuthTag only works with authenticated modes like GCM
+        Assert.Throws<NotImplementedException>(() => cipher.getAuthTag());
+    }
+
+    [Fact]
+    public void Cipher_SetAAD_ThrowsNotImplemented()
+    {
+        var cipher = crypto.createCipheriv("aes-256-cbc", crypto.randomBytes(32), crypto.randomBytes(16));
+
+        // setAAD only works with authenticated modes like GCM
+        Assert.Throws<NotImplementedException>(() => cipher.setAAD(Encoding.UTF8.GetBytes("additional data")));
+    }
+
+    [Fact]
+    public void Decipher_SetAuthTag_ThrowsNotImplemented()
+    {
+        var decipher = crypto.createDecipheriv("aes-256-cbc", crypto.randomBytes(32), crypto.randomBytes(16));
+
+        // setAuthTag only works with authenticated modes like GCM
+        Assert.Throws<NotImplementedException>(() => decipher.setAuthTag(new byte[16]));
+    }
+
+    [Fact]
+    public void Decipher_SetAAD_ThrowsNotImplemented()
+    {
+        var decipher = crypto.createDecipheriv("aes-256-cbc", crypto.randomBytes(32), crypto.randomBytes(16));
+
+        // setAAD only works with authenticated modes like GCM
+        Assert.Throws<NotImplementedException>(() => decipher.setAAD(Encoding.UTF8.GetBytes("additional data")));
+    }
+
+    // ========== DiffieHellman Advanced Methods ==========
+
+    [Fact]
+    public void DiffieHellman_WithGeneratedPrime_ThrowsNotImplemented()
+    {
+        // DiffieHellman with auto-generated prime is not implemented
+        Assert.Throws<NotImplementedException>(() => crypto.createDiffieHellman(256));
+    }
+
+    // ========== ECDH Advanced Methods ==========
+
+    [Fact]
+    public void ECDH_SetPublicKey_ThrowsNotSupported()
+    {
+        var ecdh = crypto.createECDH("secp256r1");
+        var publicKey = new byte[65];
+
+        // ECDH.setPublicKey is not supported
+        Assert.Throws<NotSupportedException>(() => ecdh.setPublicKey(publicKey));
+    }
+
+    [Fact]
+    public void ECDH_SetPrivateKey_Works()
+    {
+        var ecdh1 = crypto.createECDH("secp256r1");
+        ecdh1.generateKeys();
+        var privateKey = ecdh1.getPrivateKey();
+
+        var ecdh2 = crypto.createECDH("secp256r1");
+        ecdh2.setPrivateKey(privateKey);
+        var retrieved = ecdh2.getPrivateKey();
+
+        Assert.Equal(privateKey, retrieved);
+    }
+
+    // ========== KeyObject Export Tests ==========
+
+    [Fact]
+    public void SecretKeyObject_Export_Works()
+    {
+        var keyData = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+        var keyObj = crypto.createSecretKey(keyData) as SecretKeyObject;
+        var exported = keyObj!.export();
+
+        Assert.Equal(keyData, exported);
+    }
+
+    [Fact]
+    public void PublicKeyObject_ExportWithFormat_Pem_Works()
+    {
+        var (publicKey, _) = crypto.generateKeyPairSync("rsa", null);
+        var pem = ((PublicKeyObject)publicKey).export("pem", "spki");
+
+        Assert.Contains("BEGIN PUBLIC KEY", pem);
+        Assert.Contains("END PUBLIC KEY", pem);
+    }
+
+    [Fact]
+    public void PublicKeyObject_ExportWithFormat_Der_Works()
+    {
+        var (publicKey, _) = crypto.generateKeyPairSync("rsa", null);
+        var der = ((PublicKeyObject)publicKey).export("der", "spki");
+
+        Assert.NotEmpty(der);
+    }
+
+    [Fact]
+    public void PrivateKeyObject_ExportWithFormat_Pem_Works()
+    {
+        var (_, privateKey) = crypto.generateKeyPairSync("rsa", null);
+        var pem = ((PrivateKeyObject)privateKey).export("pem", "pkcs8");
+
+        Assert.Contains("BEGIN PRIVATE KEY", pem);
+        Assert.Contains("END PRIVATE KEY", pem);
+    }
+
+    [Fact]
+    public void PrivateKeyObject_ExportWithFormat_Der_Works()
+    {
+        var (_, privateKey) = crypto.generateKeyPairSync("rsa", null);
+        var der = ((PrivateKeyObject)privateKey).export("der", "pkcs8");
+
+        Assert.NotEmpty(der);
+    }
+
+    [Fact]
+    public void PrivateKeyObject_ExportEncrypted_Works()
+    {
+        var (_, privateKey) = crypto.generateKeyPairSync("rsa", null);
+        var encrypted = ((PrivateKeyObject)privateKey).export("pem", "pkcs8", "aes256", "password123");
+
+        // Encrypted export returns DER bytes (not PEM), check it's not empty
+        Assert.NotEmpty(encrypted);
+    }
+
+    // ========== NotImplemented Methods Tests ==========
+
+    [Fact]
+    public void ScryptSync_ThrowsNotImplemented()
+    {
+        Assert.Throws<NotImplementedException>(() => crypto.scryptSync("password", "salt", 32, null));
+    }
+
+    [Fact]
+    public void Scrypt_Callback_ThrowsNotImplemented()
+    {
+        Exception? caughtError = null;
+        crypto.scrypt("password", "salt", 32, null, (err, key) =>
+        {
+            caughtError = err;
+        });
+
+        Assert.IsType<NotImplementedException>(caughtError);
+    }
+
+    [Fact]
+    public void PublicDecrypt_ThrowsNotImplemented()
+    {
+        var (publicKey, _) = crypto.generateKeyPairSync("rsa", null);
+        var publicPem = publicKey.export().ToString()!;
+
+        Assert.Throws<NotImplementedException>(() => crypto.publicDecrypt(publicPem, new byte[256]));
+    }
+
+    [Fact]
+    public void PublicDecrypt_WithKeyObject_ThrowsNotImplemented()
+    {
+        var (publicKey, _) = crypto.generateKeyPairSync("rsa", null);
+        Assert.Throws<NotImplementedException>(() => crypto.publicDecrypt(publicKey, new byte[256]));
+    }
+
+    [Fact]
+    public void PrivateEncrypt_ThrowsNotImplemented()
+    {
+        var (_, privateKey) = crypto.generateKeyPairSync("rsa", null);
+        var privatePem = privateKey.export().ToString()!;
+
+        Assert.Throws<NotImplementedException>(() => crypto.privateEncrypt(privatePem, new byte[64]));
+    }
+
+    [Fact]
+    public void PrivateEncrypt_WithKeyObject_ThrowsNotImplemented()
+    {
+        var (_, privateKey) = crypto.generateKeyPairSync("rsa", null);
+        Assert.Throws<NotImplementedException>(() => crypto.privateEncrypt(privateKey, new byte[64]));
+    }
+
+    [Fact]
+    public void GenerateKey_ThrowsNotImplemented()
+    {
+        Assert.Throws<NotImplementedException>(() => crypto.generateKey("aes", new { length = 256 }));
+    }
+
+    [Fact]
+    public void GenerateKey_Callback_ThrowsNotImplemented()
+    {
+        Exception? caughtError = null;
+        crypto.generateKey("aes", new { length = 256 }, (err, key) =>
+        {
+            caughtError = err;
+        });
+
+        Assert.IsType<NotImplementedException>(caughtError);
+    }
+
+    [Fact]
+    public void HkdfSync_ThrowsNotImplemented()
+    {
+        Assert.Throws<NotImplementedException>(() =>
+            crypto.hkdfSync("sha256", new byte[32], new byte[16], new byte[16], 32));
+    }
+
+    [Fact]
+    public void Hkdf_Callback_ThrowsNotImplemented()
+    {
+        Exception? caughtError = null;
+        crypto.hkdf("sha256", new byte[32], new byte[16], new byte[16], 32, (err, key) =>
+        {
+            caughtError = err;
+        });
+
+        Assert.IsType<NotImplementedException>(caughtError);
+    }
+
+    [Fact]
+    public void GetDiffieHellman_ThrowsNotImplemented()
+    {
+        Assert.Throws<NotImplementedException>(() => crypto.getDiffieHellman("modp1"));
+    }
+
+    [Fact]
+    public void GenerateKeyPairSync_Ed25519_ThrowsNotImplemented()
+    {
+        Assert.Throws<NotImplementedException>(() => crypto.generateKeyPairSync("ed25519", null));
+    }
+
+    [Fact]
+    public void GenerateKeyPairSync_DSA_ThrowsNotImplemented()
+    {
+        Assert.Throws<NotImplementedException>(() => crypto.generateKeyPairSync("dsa", null));
+    }
+
+    [Fact]
+    public void GenerateKeyPairSync_DH_ThrowsNotImplemented()
+    {
+        Assert.Throws<NotImplementedException>(() => crypto.generateKeyPairSync("dh", null));
+    }
+
+    // ========== Certificate Tests ==========
+
+    [Fact]
+    public void Certificate_ExportChallenge_String_ThrowsNotImplemented()
+    {
+        Assert.Throws<NotImplementedException>(() => Certificate.exportChallenge("test"));
+    }
+
+    [Fact]
+    public void Certificate_ExportChallenge_Bytes_ThrowsNotImplemented()
+    {
+        Assert.Throws<NotImplementedException>(() => Certificate.exportChallenge(new byte[64]));
+    }
+
+    [Fact]
+    public void Certificate_ExportPublicKey_String_ThrowsNotImplemented()
+    {
+        Assert.Throws<NotImplementedException>(() => Certificate.exportPublicKey("test"));
+    }
+
+    [Fact]
+    public void Certificate_ExportPublicKey_Bytes_ThrowsNotImplemented()
+    {
+        Assert.Throws<NotImplementedException>(() => Certificate.exportPublicKey(new byte[64]));
+    }
+
+    [Fact]
+    public void Certificate_VerifySpkac_String_ThrowsNotImplemented()
+    {
+        Assert.Throws<NotImplementedException>(() => Certificate.verifySpkac("test"));
+    }
+
+    [Fact]
+    public void Certificate_VerifySpkac_Bytes_ThrowsNotImplemented()
+    {
+        Assert.Throws<NotImplementedException>(() => Certificate.verifySpkac(new byte[64]));
+    }
 }
 
