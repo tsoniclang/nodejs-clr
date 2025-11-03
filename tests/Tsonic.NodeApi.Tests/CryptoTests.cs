@@ -263,15 +263,28 @@ public class CryptoTests
     }
 
     [Fact]
+    public void GenerateKeyPairSync_RSA_CreatesValidKeyPair()
+    {
+        var (publicKey, privateKey) = crypto.generateKeyPairSync("rsa", null);
+
+        Assert.NotNull(publicKey);
+        Assert.NotNull(privateKey);
+        Assert.Equal("public", publicKey.type);
+        Assert.Equal("private", privateKey.type);
+        Assert.Equal("rsa", publicKey.asymmetricKeyType);
+        Assert.Equal("rsa", privateKey.asymmetricKeyType);
+    }
+
+    [Fact]
     public void PublicEncrypt_PrivateDecrypt_RoundTrip()
     {
-        // Note: This test requires actual RSA keys which would need to be generated
-        // For now, we'll mark it as skipped since generateKeyPairSync throws NotImplementedException
-        // This is a placeholder for when the functionality is fully implemented
-        Assert.Throws<NotImplementedException>(() =>
-        {
-            var (publicKey, privateKey) = crypto.generateKeyPairSync("rsa", null);
-        });
+        var (publicKey, privateKey) = crypto.generateKeyPairSync("rsa", null);
+        var plaintext = Encoding.UTF8.GetBytes("Hello, World!");
+
+        var encrypted = crypto.publicEncrypt(publicKey, plaintext);
+        var decrypted = crypto.privateDecrypt(privateKey, encrypted);
+
+        Assert.Equal(plaintext, decrypted);
     }
 
     [Fact]

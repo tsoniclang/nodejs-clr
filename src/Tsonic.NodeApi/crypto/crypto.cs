@@ -366,24 +366,44 @@ public static partial class crypto
 
         if (keyType == "rsa")
         {
-            using var rsa = RSA.Create(2048); // Default 2048 bits
-            var publicKey = new PublicKeyObject(RSA.Create(), "rsa");
-            var privateKey = new PrivateKeyObject(rsa, "rsa");
+            // Generate RSA key pair
+            using var sourceRsa = RSA.Create(2048); // Default 2048 bits
 
-            // Import the keys
-            var pubKeyData = rsa.ExportSubjectPublicKeyInfo();
-            var privKeyData = rsa.ExportPkcs8PrivateKey();
+            // Export key data
+            var publicKeyData = sourceRsa.ExportSubjectPublicKeyInfo();
+            var privateKeyData = sourceRsa.ExportPkcs8PrivateKey();
 
-            var pubRsa = (RSA)((PublicKeyObject)publicKey).export();
-            ((RSA)pubRsa).ImportSubjectPublicKeyInfo(pubKeyData, out _);
+            // Create separate RSA instances for public and private keys
+            var publicRsa = RSA.Create();
+            var privateRsa = RSA.Create();
+
+            publicRsa.ImportSubjectPublicKeyInfo(publicKeyData, out _);
+            privateRsa.ImportPkcs8PrivateKey(privateKeyData, out _);
+
+            var publicKey = new PublicKeyObject(publicRsa, "rsa");
+            var privateKey = new PrivateKeyObject(privateRsa, "rsa");
 
             return (publicKey, privateKey);
         }
         else if (keyType == "ec" || keyType == "ecdsa")
         {
-            using var ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
-            var publicKey = new PublicKeyObject(ECDsa.Create(ECCurve.NamedCurves.nistP256), "ec");
-            var privateKey = new PrivateKeyObject(ecdsa, "ec");
+            // Generate EC key pair
+            using var sourceEcdsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+
+            // Export key data
+            var publicKeyData = sourceEcdsa.ExportSubjectPublicKeyInfo();
+            var privateKeyData = sourceEcdsa.ExportPkcs8PrivateKey();
+
+            // Create separate ECDSA instances
+            var publicEcdsa = ECDsa.Create();
+            var privateEcdsa = ECDsa.Create();
+
+            publicEcdsa.ImportSubjectPublicKeyInfo(publicKeyData, out _);
+            privateEcdsa.ImportPkcs8PrivateKey(privateKeyData, out _);
+
+            var publicKey = new PublicKeyObject(publicEcdsa, "ec");
+            var privateKey = new PrivateKeyObject(privateEcdsa, "ec");
+
             return (publicKey, privateKey);
         }
         else if (keyType == "ed25519" || keyType == "ed448" || keyType == "x25519" || keyType == "x448")
