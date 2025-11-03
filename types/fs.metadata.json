@@ -1,0 +1,217 @@
+{
+  "assemblyName": "Tsonic.NodeApi",
+  "types": {
+    "Tsonic.NodeApi.fs": {
+      "kind": "class",
+      "isStatic": true,
+      "members": {
+        "readFileSync(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "readFileSync(string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "readFile(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "readFile(string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "writeFileSync(string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "writeFileSync(string,string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "writeFile(string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "writeFile(string,string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "appendFileSync(string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "appendFileSync(string,string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "appendFile(string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "appendFile(string,string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "existsSync(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "mkdirSync(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "mkdirSync(string,bool)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "mkdir(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "mkdir(string,bool)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "readdirSync(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "readdirSync(string,bool)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "readdir(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "readdir(string,bool)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "statSync(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "stat(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "unlinkSync(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "unlink(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "rmdirSync(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "rmdirSync(string,bool)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "rmdir(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "rmdir(string,bool)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "copyFileSync(string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "copyFileSync(string,string,int)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "copyFile(string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "copyFile(string,string,int)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "renameSync(string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "rename(string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "readFileSyncBytes(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "readFileBytes(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "writeFileSyncBytes(string,byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "writeFileBytes(string,byte[])": {
+          "kind": "method",
+          "isStatic": true
+        }
+      }
+    },
+    "Tsonic.NodeApi.Stats": {
+      "kind": "class",
+      "members": {
+        "size": {
+          "kind": "property"
+        },
+        "mode": {
+          "kind": "property"
+        },
+        "atime": {
+          "kind": "property"
+        },
+        "mtime": {
+          "kind": "property"
+        },
+        "ctime": {
+          "kind": "property"
+        },
+        "birthtime": {
+          "kind": "property"
+        },
+        "isFile": {
+          "kind": "property"
+        },
+        "isDirectory": {
+          "kind": "property"
+        },
+        "IsFile()": {
+          "kind": "method"
+        },
+        "IsDirectory()": {
+          "kind": "method"
+        },
+        "IsSymbolicLink()": {
+          "kind": "method"
+        },
+        "IsBlockDevice()": {
+          "kind": "method"
+        },
+        "IsCharacterDevice()": {
+          "kind": "method"
+        },
+        "IsFIFO()": {
+          "kind": "method"
+        },
+        "IsSocket()": {
+          "kind": "method"
+        }
+      }
+    }
+  }
+}

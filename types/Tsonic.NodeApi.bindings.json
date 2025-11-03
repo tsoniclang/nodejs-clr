@@ -1,0 +1,20 @@
+{
+  "bindings": {
+    "path": {
+      "kind": "module",
+      "assembly": "Tsonic.NodeApi",
+      "type": "Tsonic.NodeApi.path"
+    },
+    "fs": {
+      "kind": "module",
+      "assembly": "Tsonic.NodeApi",
+      "type": "Tsonic.NodeApi.fs"
+    },
+    "events": {
+      "kind": "module",
+      "assembly": "Tsonic.NodeApi",
+      "type": "Tsonic.NodeApi.EventEmitter",
+      "default": "Tsonic.NodeApi.EventEmitter"
+    }
+  }
+}

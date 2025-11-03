@@ -52,3 +52,16 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# IDE
+.vscode/
+
+# Working directories (see CLAUDE.md)
+.tests/          # Test run output capture
+.analysis/       # Research and documentation artifacts
+.todos/          # Persistent task tracking
+
+# Test outputs
+tests/**/TestResults/
+tests/**/*.trx
+**/test-output/

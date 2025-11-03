@@ -1,0 +1,40 @@
+{
+  "name": "@tsonic/node-types",
+  "version": "1.0.0",
+  "description": "TypeScript definitions and bindings for Node.js API implementation on .NET",
+  "main": "types/index.d.ts",
+  "types": "types/index.d.ts",
+  "files": [
+    "types/**/*.d.ts",
+    "types/**/*.json"
+  ],
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "dotnet build",
+    "pack": "dotnet pack src/Tsonic.NodeApi/Tsonic.NodeApi.csproj -c Release"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tsoniclang/tsonic-node.git"
+  },
+  "keywords": [
+    "tsonic",
+    "nodejs",
+    "dotnet",
+    "typescript",
+    "node-api",
+    "csharp"
+  ],
+  "author": "tsoniclang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tsoniclang/tsonic-node/issues"
+  },
+  "homepage": "https://github.com/tsoniclang/tsonic-node#readme",
+  "devDependencies": {
+    "@types/node": "^24.10.0"
+  }
+}
