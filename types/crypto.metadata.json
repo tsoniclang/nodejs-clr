@@ -1,0 +1,670 @@
+{
+  "assemblyName": "Tsonic.NodeApi",
+  "types": {
+    "Tsonic.NodeApi.Hash": {
+      "kind": "class",
+      "isStatic": false,
+      "members": {
+        "update(string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "update(byte[])": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "digest(string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "digest()": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "copy()": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "Dispose()": {
+          "kind": "method",
+          "isStatic": false
+        }
+      }
+    },
+    "Tsonic.NodeApi.Hmac": {
+      "kind": "class",
+      "isStatic": false,
+      "members": {
+        "update(string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "update(byte[])": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "digest(string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "digest()": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "Dispose()": {
+          "kind": "method",
+          "isStatic": false
+        }
+      }
+    },
+    "Tsonic.NodeApi.Cipher": {
+      "kind": "class",
+      "isStatic": false,
+      "members": {
+        "update(string,string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "update(byte[],string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "final(string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "final()": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "setAuthTag(int)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "getAuthTag()": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "setAAD(byte[])": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "Dispose()": {
+          "kind": "method",
+          "isStatic": false
+        }
+      }
+    },
+    "Tsonic.NodeApi.Decipher": {
+      "kind": "class",
+      "isStatic": false,
+      "members": {
+        "update(string,string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "update(byte[],string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "final(string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "final()": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "setAuthTag(byte[])": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "setAAD(byte[])": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "Dispose()": {
+          "kind": "method",
+          "isStatic": false
+        }
+      }
+    },
+    "Tsonic.NodeApi.Sign": {
+      "kind": "class",
+      "isStatic": false,
+      "members": {
+        "update(string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "update(byte[])": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "sign(string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "sign(string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "sign(object,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "sign(object)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "Dispose()": {
+          "kind": "method",
+          "isStatic": false
+        }
+      }
+    },
+    "Tsonic.NodeApi.Verify": {
+      "kind": "class",
+      "isStatic": false,
+      "members": {
+        "update(string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "update(byte[])": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "verify(string,string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "verify(string,byte[])": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "verify(object,string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "verify(object,byte[])": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "Dispose()": {
+          "kind": "method",
+          "isStatic": false
+        }
+      }
+    },
+    "Tsonic.NodeApi.DiffieHellman": {
+      "kind": "class",
+      "isStatic": false,
+      "members": {
+        "generateKeys(string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "generateKeys()": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "computeSecret(string,string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "computeSecret(byte[],string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "computeSecret(byte[])": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "getPrime(string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "getPrime()": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "getGenerator(string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "getGenerator()": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "getPublicKey(string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "getPublicKey()": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "getPrivateKey(string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "getPrivateKey()": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "setPublicKey(string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "setPublicKey(byte[])": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "setPrivateKey(string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "setPrivateKey(byte[])": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "getVerifyError()": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "Dispose()": {
+          "kind": "method",
+          "isStatic": false
+        }
+      }
+    },
+    "Tsonic.NodeApi.ECDH": {
+      "kind": "class",
+      "isStatic": false,
+      "members": {
+        "generateKeys(string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "generateKeys()": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "computeSecret(string,string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "computeSecret(byte[],string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "computeSecret(byte[])": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "getPublicKey(string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "getPublicKey()": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "getPrivateKey(string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "getPrivateKey()": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "setPublicKey(string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "setPublicKey(byte[])": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "setPrivateKey(string,string)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "setPrivateKey(byte[])": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "Dispose()": {
+          "kind": "method",
+          "isStatic": false
+        }
+      }
+    },
+    "Tsonic.NodeApi.KeyObject": {
+      "kind": "class",
+      "isStatic": false,
+      "members": {
+        "type": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "asymmetricKeyType": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "symmetricKeySize": {
+          "kind": "property",
+          "isStatic": false
+        },
+        "export(object)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "Dispose()": {
+          "kind": "method",
+          "isStatic": false
+        }
+      }
+    },
+    "Tsonic.NodeApi.SecretKeyObject": {
+      "kind": "class",
+      "isStatic": false,
+      "baseClass": "Tsonic.NodeApi.KeyObject",
+      "members": {
+        "export(object)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "export()": {
+          "kind": "method",
+          "isStatic": false
+        }
+      }
+    },
+    "Tsonic.NodeApi.PublicKeyObject": {
+      "kind": "class",
+      "isStatic": false,
+      "baseClass": "Tsonic.NodeApi.KeyObject",
+      "members": {
+        "export(object)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "export(string,string)": {
+          "kind": "method",
+          "isStatic": false
+        }
+      }
+    },
+    "Tsonic.NodeApi.PrivateKeyObject": {
+      "kind": "class",
+      "isStatic": false,
+      "baseClass": "Tsonic.NodeApi.KeyObject",
+      "members": {
+        "export(object)": {
+          "kind": "method",
+          "isStatic": false
+        },
+        "export(string,string,string,string)": {
+          "kind": "method",
+          "isStatic": false
+        }
+      }
+    },
+    "Tsonic.NodeApi.crypto": {
+      "kind": "class",
+      "isStatic": true,
+      "members": {
+        "createHash(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createHmac(string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createHmac(string,byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createCipheriv(string,byte[],byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createCipheriv(string,string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createDecipheriv(string,byte[],byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createDecipheriv(string,string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createSign(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createVerify(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createDiffieHellman(int,int)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createDiffieHellman(byte[],byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createDiffieHellman(byte[],int)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createDiffieHellman(string,string,int)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createDiffieHellman(string,string,string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "getDiffieHellman(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createECDH(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "randomBytes(int)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "randomBytes(int,Action<Exception,byte[]>)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "randomInt(int)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "randomInt(int,int)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "randomFillSync(byte[],int,int)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "randomFill(byte[],int,int,Action<Exception,byte[]>)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "randomUUID()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "pbkdf2Sync(string,string,int,int,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "pbkdf2Sync(byte[],byte[],int,int,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "pbkdf2(string,string,int,int,string,Action<Exception,byte[]>)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "scryptSync(string,string,int,object)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "scrypt(string,string,int,object,Action<Exception,byte[]>)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "hkdfSync(string,byte[],byte[],byte[],int)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "hkdf(string,byte[],byte[],byte[],int,Action<Exception,byte[]>)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "getCiphers()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "getHashes()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "getCurves()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "getDefaultCipherList()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "timingSafeEqual(byte[],byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createSecretKey(byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createSecretKey(string,string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createPublicKey(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createPublicKey(byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createPublicKey(KeyObject)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createPrivateKey(string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "createPrivateKey(byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "generateKeyPair(string,object,Action<Exception,object,object>)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "generateKeyPairSync(string,object)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "generateKey(string,object)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "generateKey(string,object,Action<Exception,KeyObject>)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "publicEncrypt(string,byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "publicEncrypt(object,byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "privateDecrypt(string,byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "privateDecrypt(object,byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "publicDecrypt(string,byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "publicDecrypt(object,byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "privateEncrypt(string,byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "privateEncrypt(object,byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "sign(string,byte[],string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "sign(string,byte[],KeyObject)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "verify(string,byte[],string,byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "verify(string,byte[],KeyObject,byte[])": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "hash(string,byte[],string)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "getFips()": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "setFips(bool)": {
+          "kind": "method",
+          "isStatic": true
+        },
+        "setDefaultEncoding(string)": {
+          "kind": "method",
+          "isStatic": true
+        }
+      }
+    }
+  }
+}

@@ -74,6 +74,11 @@
       "assembly": "Tsonic.NodeApi",
       "type": "Tsonic.NodeApi.Stream",
       "default": "Tsonic.NodeApi.Stream"
+    },
+    "crypto": {
+      "kind": "module",
+      "assembly": "Tsonic.NodeApi",
+      "type": "Tsonic.NodeApi.crypto"
     }
   }
 }
