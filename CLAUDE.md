@@ -41,6 +41,20 @@ This applies to ANY question, even if it seems like part of a larger task or dis
 
 Automated scripts break syntax in unpredictable ways and destroy codebases.
 
+### NEVER USE GH PR COMMANDS
+
+**🚨 CRITICAL RULE: NEVER use `gh pr` commands for creating pull requests. 🚨**
+
+- **NEVER** run `gh pr create` or any other `gh pr` commands
+- **NEVER** attempt to create pull requests via CLI
+- **ONLY** push branches to remote with `git push`
+- The user will create pull requests manually through the GitHub web interface
+
+When asked to commit and push changes:
+1. Commit changes with detailed commit messages
+2. Push to a feature branch (NOT directly to main)
+3. STOP - do not attempt to create pull requests
+
 ### WORKING DIRECTORIES
 
 **IMPORTANT**: Never create temporary files in the project root or src directories. Use dedicated gitignored directories for different purposes.
