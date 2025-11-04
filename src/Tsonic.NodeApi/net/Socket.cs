@@ -442,6 +442,14 @@ public class Socket : Stream
             remoteFamily = remoteEP.AddressFamily == AddressFamily.InterNetwork ? "IPv4" : "IPv6";
         }
     }
+
+    /// <summary>
+    /// Gets the underlying TcpClient (for TLS wrapping).
+    /// </summary>
+    internal TcpClient? GetTcpClient()
+    {
+        return _client;
+    }
 }
 
 #pragma warning restore CS8981

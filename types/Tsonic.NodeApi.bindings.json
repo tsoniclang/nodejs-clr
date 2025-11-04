@@ -94,6 +94,11 @@
       "kind": "module",
       "assembly": "Tsonic.NodeApi",
       "type": "Tsonic.NodeApi.net"
+    },
+    "tls": {
+      "kind": "module",
+      "assembly": "Tsonic.NodeApi",
+      "type": "Tsonic.NodeApi.tls"
     }
   }
 }

@@ -15,3 +15,4 @@ export * from "./stream.js";
 export * from "./child_process.js";
 export * from "./dns.js";
 export * from "./net.js";
+export * from "./tls.js";
