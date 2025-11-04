@@ -44,7 +44,7 @@ private static int _defaultMaxListeners = 10;
 ### Code Organization
 
 ```csharp
-namespace Tsonic.NodeApi;
+namespace Tsonic.StdLib;
 
 /// <summary>
 /// Module-level summary.
@@ -212,9 +212,9 @@ export function basename(path: string, suffix?: string): string;
 
 ```json
 {
-  "assemblyName": "Tsonic.NodeApi",
+  "assemblyName": "Tsonic.StdLib",
   "types": {
-    "Tsonic.NodeApi.TypeName": {
+    "Tsonic.StdLib.TypeName": {
       "kind": "class",
       "isStatic": true,
       "members": {
@@ -250,8 +250,8 @@ export function basename(path: string, suffix?: string): string;
   "bindings": {
     "moduleName": {
       "kind": "module",
-      "assembly": "Tsonic.NodeApi",
-      "type": "Tsonic.NodeApi.className"
+      "assembly": "Tsonic.StdLib",
+      "type": "Tsonic.StdLib.className"
     }
   }
 }
@@ -344,11 +344,11 @@ Assert.Same(expected, actual);
 ### Solution Structure
 
 ```
-Tsonic.NodeApi.sln              # Solution file
+Tsonic.StdLib.sln              # Solution file
 ├── Directory.Build.props        # Shared properties
 ├── src/
-│   └── Tsonic.NodeApi/
-│       ├── Tsonic.NodeApi.csproj
+│   └── Tsonic.StdLib/
+│       ├── Tsonic.StdLib.csproj
 │       ├── module1.cs
 │       └── module2.cs
 ├── types/
@@ -356,11 +356,11 @@ Tsonic.NodeApi.sln              # Solution file
 │   ├── module1.metadata.json
 │   ├── module2.d.ts
 │   ├── module2.metadata.json
-│   ├── Tsonic.NodeApi.bindings.json
+│   ├── Tsonic.StdLib.bindings.json
 │   └── index.d.ts
 ├── tests/
-│   └── Tsonic.NodeApi.Tests/
-│       ├── Tsonic.NodeApi.Tests.csproj
+│   └── Tsonic.StdLib.Tests/
+│       ├── Tsonic.StdLib.Tests.csproj
 │       ├── Module1Tests.cs
 │       └── Module2Tests.cs
 ├── docs/                        # Documentation
@@ -438,8 +438,8 @@ Always ignore:
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>Tsonic.NodeApi</AssemblyName>
-    <RootNamespace>Tsonic.NodeApi</RootNamespace>
+    <AssemblyName>Tsonic.StdLib</AssemblyName>
+    <RootNamespace>Tsonic.StdLib</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 </Project>
@@ -487,7 +487,7 @@ Before submitting code:
 - [ ] No compiler warnings (TreatWarningsAsErrors=true)
 - [ ] Metadata JSON is valid and complete
 - [ ] Type definitions match @types/node
-- [ ] Binding added to Tsonic.NodeApi.bindings.json
+- [ ] Binding added to Tsonic.StdLib.bindings.json
 - [ ] Platform-specific code handles Windows and Unix
 - [ ] Temp files cleaned up in tests
 - [ ] Null safety annotations used correctly
