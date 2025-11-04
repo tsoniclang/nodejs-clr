@@ -1,6 +1,11 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Signers;
+using Org.BouncyCastle.OpenSsl;
+using System.IO;
 
 namespace Tsonic.NodeApi;
 
@@ -108,10 +113,85 @@ public class Sign : Transform
             }
             catch (Exception)
             {
-                // Try DSA (not fully supported in .NET)
-                throw new NotImplementedException("DSA signing is not yet fully supported");
+                // Try DSA using BouncyCastle
+                try
+                {
+                    using var reader = new StringReader(privateKey);
+                    var pemReader = new PemReader(reader);
+                    var keyObject = pemReader.ReadObject();
+
+                    AsymmetricKeyParameter dsaKey = keyObject switch
+                    {
+                        AsymmetricCipherKeyPair keyPair => keyPair.Private,
+                        AsymmetricKeyParameter key => key,
+                        _ => throw new ArgumentException("Invalid DSA key format")
+                    };
+
+                    return SignWithDsa(data, dsaKey, _algorithm);
+                }
+                catch (Exception ex)
+                {
+                    throw new NotSupportedException($"Unsupported key format or algorithm: {ex.Message}");
+                }
             }
         }
+    }
+
+    private byte[] SignWithDsa(byte[] data, AsymmetricKeyParameter privateKey, string algorithm)
+    {
+        // Hash the data first
+        var digest = CreateBouncyCastleDigest(algorithm);
+        digest.BlockUpdate(data, 0, data.Length);
+        var hash = new byte[digest.GetDigestSize()];
+        digest.DoFinal(hash, 0);
+
+        // Sign the hash
+        var signer = new DsaSigner();
+        signer.Init(true, privateKey);
+        var signature = signer.GenerateSignature(hash);
+
+        // Convert signature to DER format (concatenate r and s)
+        var r = signature[0].ToByteArrayUnsigned();
+        var s = signature[1].ToByteArrayUnsigned();
+
+        // Create DER encoded signature
+        using var ms = new MemoryStream();
+        using var writer = new BinaryWriter(ms);
+
+        // SEQUENCE tag
+        writer.Write((byte)0x30);
+
+        // Calculate total length
+        int rLen = r.Length + 2;  // +2 for INTEGER tag and length
+        int sLen = s.Length + 2;
+        writer.Write((byte)(rLen + sLen));
+
+        // Write r
+        writer.Write((byte)0x02); // INTEGER tag
+        writer.Write((byte)r.Length);
+        writer.Write(r);
+
+        // Write s
+        writer.Write((byte)0x02); // INTEGER tag
+        writer.Write((byte)s.Length);
+        writer.Write(s);
+
+        return ms.ToArray();
+    }
+
+    private IDigest CreateBouncyCastleDigest(string algorithm)
+    {
+        return algorithm.ToLowerInvariant() switch
+        {
+            "sha1" => new Sha1Digest(),
+            "sha256" => new Sha256Digest(),
+            "sha384" => new Sha384Digest(),
+            "sha512" => new Sha512Digest(),
+            "sha3-256" => new Sha3Digest(256),
+            "sha3-384" => new Sha3Digest(384),
+            "sha3-512" => new Sha3Digest(512),
+            _ => new Sha256Digest() // Default to SHA256
+        };
     }
 
     /// <summary>
@@ -149,11 +229,18 @@ public class Sign : Transform
         if (_finalized)
             throw new InvalidOperationException("Sign already finalized");
 
-        if (privateKey is not PrivateKeyObject keyObject)
-            throw new ArgumentException("privateKey must be a PrivateKeyObject", nameof(privateKey));
-
         _finalized = true;
         var data = _dataStream.ToArray();
+
+        // Check for DSA key first
+        if (privateKey is DSAPrivateKeyObject dsaPrivateKey)
+        {
+            var dsaKey = dsaPrivateKey.GetKey();
+            return SignWithDsa(data, dsaKey, _algorithm);
+        }
+
+        if (privateKey is not PrivateKeyObject keyObject)
+            throw new ArgumentException("privateKey must be a PrivateKeyObject", nameof(privateKey));
 
         var key = keyObject.GetKey();
         var hashAlgorithm = GetHashAlgorithmName(_algorithm);

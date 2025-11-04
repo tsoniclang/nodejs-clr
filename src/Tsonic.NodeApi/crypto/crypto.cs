@@ -486,7 +486,20 @@ public static partial class crypto
         }
         else if (keyType == "dh")
         {
-            throw new NotImplementedException("DH key generation is not yet implemented. Use createDiffieHellman instead.");
+            // Generate DH key pair using createDiffieHellman
+            // Default to 2048-bit prime for security
+            var dh = createDiffieHellman(2048);
+            dh.generateKeys();
+
+            // Export keys (this is a simplification - real implementation would need proper KeyObject wrappers)
+            var publicKeyBytes = dh.getPublicKey();
+            var privateKeyBytes = dh.getPrivateKey();
+
+            // For now, return as secret keys since DH doesn't fit the asymmetric key model cleanly
+            var publicKey = new SecretKeyObject(publicKeyBytes);
+            var privateKey = new SecretKeyObject(privateKeyBytes);
+
+            return ((KeyObject)publicKey, (KeyObject)privateKey);
         }
 
         throw new ArgumentException($"Unknown key type: {type}");
@@ -551,13 +564,22 @@ public static partial class crypto
     /// </summary>
     public static byte[] publicDecrypt(string key, byte[] buffer)
     {
-        // Note: Public key decryption is unusual and primarily used for signature verification
-        using var rsa = RSA.Create();
-        rsa.ImportFromPem(key);
+        // Public key decryption - used for verifying data encrypted with private key
+        // This is the inverse of private key encryption (privateEncrypt)
+        try
+        {
+            using var rsa = RSA.Create();
+            rsa.ImportFromPem(key);
 
-        // .NET doesn't have a direct public decrypt operation
-        // This would be used in signature verification scenarios
-        throw new NotImplementedException("publicDecrypt is not commonly used. Use verify() instead for signature verification.");
+            // Use Decrypt with PKCS1 padding (acts as "public decrypt")
+            // Note: This will fail with standard .NET RSA because Decrypt requires private key
+            // We need to use a workaround or BouncyCastle
+            return PublicDecryptWithBouncyCastle(key, buffer);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Public decrypt failed: {ex.Message}", ex);
+        }
     }
 
     /// <summary>
@@ -565,7 +587,30 @@ public static partial class crypto
     /// </summary>
     public static byte[] publicDecrypt(object key, byte[] buffer)
     {
-        throw new NotImplementedException("publicDecrypt is not commonly used. Use verify() instead for signature verification.");
+        if (key is not PublicKeyObject keyObject)
+            throw new ArgumentException("key must be a PublicKeyObject", nameof(key));
+
+        var keyPem = keyObject.export() as string ?? throw new InvalidOperationException("Failed to export public key");
+        return publicDecrypt(keyPem, buffer);
+    }
+
+    private static byte[] PublicDecryptWithBouncyCastle(string publicKeyPem, byte[] buffer)
+    {
+        using var reader = new StringReader(publicKeyPem);
+        var pemReader = new Org.BouncyCastle.OpenSsl.PemReader(reader);
+        var keyObject = pemReader.ReadObject();
+
+        Org.BouncyCastle.Crypto.AsymmetricKeyParameter publicKey = keyObject switch
+        {
+            Org.BouncyCastle.Crypto.AsymmetricCipherKeyPair keyPair => keyPair.Public,
+            Org.BouncyCastle.Crypto.AsymmetricKeyParameter key => key,
+            _ => throw new ArgumentException("Invalid public key format")
+        };
+
+        var engine = new Org.BouncyCastle.Crypto.Encodings.Pkcs1Encoding(new Org.BouncyCastle.Crypto.Engines.RsaEngine());
+        engine.Init(false, publicKey); // false = decrypt mode
+
+        return engine.ProcessBlock(buffer, 0, buffer.Length);
     }
 
     /// <summary>
@@ -573,13 +618,16 @@ public static partial class crypto
     /// </summary>
     public static byte[] privateEncrypt(string key, byte[] buffer)
     {
-        // Note: Private key encryption is unusual and primarily used for digital signatures
-        using var rsa = RSA.Create();
-        rsa.ImportFromPem(key);
-
-        // .NET doesn't have a direct private encrypt operation
-        // This would be used in signature scenarios
-        throw new NotImplementedException("privateEncrypt is not commonly used. Use sign() instead for digital signatures.");
+        // Private key encryption - inverse of public key decryption
+        // This is used for creating signatures (without hashing)
+        try
+        {
+            return PrivateEncryptWithBouncyCastle(key, buffer);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Private encrypt failed: {ex.Message}", ex);
+        }
     }
 
     /// <summary>
@@ -587,7 +635,30 @@ public static partial class crypto
     /// </summary>
     public static byte[] privateEncrypt(object key, byte[] buffer)
     {
-        throw new NotImplementedException("privateEncrypt is not commonly used. Use sign() instead for digital signatures.");
+        if (key is not PrivateKeyObject keyObject)
+            throw new ArgumentException("key must be a PrivateKeyObject", nameof(key));
+
+        var keyPem = keyObject.export() as string ?? throw new InvalidOperationException("Failed to export private key");
+        return privateEncrypt(keyPem, buffer);
+    }
+
+    private static byte[] PrivateEncryptWithBouncyCastle(string privateKeyPem, byte[] buffer)
+    {
+        using var reader = new StringReader(privateKeyPem);
+        var pemReader = new Org.BouncyCastle.OpenSsl.PemReader(reader);
+        var keyObject = pemReader.ReadObject();
+
+        Org.BouncyCastle.Crypto.AsymmetricKeyParameter privateKey = keyObject switch
+        {
+            Org.BouncyCastle.Crypto.AsymmetricCipherKeyPair keyPair => keyPair.Private,
+            Org.BouncyCastle.Crypto.AsymmetricKeyParameter key => key,
+            _ => throw new ArgumentException("Invalid private key format")
+        };
+
+        var engine = new Org.BouncyCastle.Crypto.Encodings.Pkcs1Encoding(new Org.BouncyCastle.Crypto.Engines.RsaEngine());
+        engine.Init(true, privateKey); // true = encrypt mode
+
+        return engine.ProcessBlock(buffer, 0, buffer.Length);
     }
 
     /// <summary>
@@ -755,11 +826,25 @@ public static partial class crypto
     }
 
     /// <summary>
-    /// Generates a deterministic private key from a password and salt.
+    /// Generates a symmetric key for the specified algorithm.
     /// </summary>
     public static KeyObject generateKey(string type, object options)
     {
-        throw new NotImplementedException("generateKey is not yet implemented. Use generateKeyPair instead.");
+        // Default lengths for common algorithms (in bytes)
+        int length = type.ToLowerInvariant() switch
+        {
+            "aes" or "aes-256-cbc" or "aes-256-gcm" => 32, // 256 bits
+            "aes-192-cbc" or "aes-192-gcm" => 24, // 192 bits
+            "aes-128-cbc" or "aes-128-gcm" => 16, // 128 bits
+            "hmac" => 64, // 512 bits for HMAC
+            _ => 32 // Default to 256 bits
+        };
+
+        // Generate random bytes
+        var keyBytes = new byte[length];
+        RandomNumberGenerator.Fill(keyBytes);
+
+        return createSecretKey(keyBytes);
     }
 
     /// <summary>

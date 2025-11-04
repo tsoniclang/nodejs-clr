@@ -1,6 +1,7 @@
 using Xunit;
 using System;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace Tsonic.NodeApi.Tests;
 
@@ -1654,53 +1655,71 @@ public class CryptoTests
     }
 
     [Fact]
-    public void PublicDecrypt_ThrowsNotImplemented()
+    public void PrivateEncrypt_PublicDecrypt_Roundtrip()
     {
-        var (publicKey, _) = crypto.generateKeyPairSync("rsa", null);
+        var (publicKey, privateKey) = crypto.generateKeyPairSync("rsa", null);
         var publicPem = publicKey.export().ToString()!;
-
-        Assert.Throws<NotImplementedException>(() => crypto.publicDecrypt(publicPem, new byte[256]));
-    }
-
-    [Fact]
-    public void PublicDecrypt_WithKeyObject_ThrowsNotImplemented()
-    {
-        var (publicKey, _) = crypto.generateKeyPairSync("rsa", null);
-        Assert.Throws<NotImplementedException>(() => crypto.publicDecrypt(publicKey, new byte[256]));
-    }
-
-    [Fact]
-    public void PrivateEncrypt_ThrowsNotImplemented()
-    {
-        var (_, privateKey) = crypto.generateKeyPairSync("rsa", null);
         var privatePem = privateKey.export().ToString()!;
 
-        Assert.Throws<NotImplementedException>(() => crypto.privateEncrypt(privatePem, new byte[64]));
+        var plaintext = new byte[32];
+        RandomNumberGenerator.Fill(plaintext);
+
+        // Private encrypt then public decrypt
+        var encrypted = crypto.privateEncrypt(privatePem, plaintext);
+        var decrypted = crypto.publicDecrypt(publicPem, encrypted);
+
+        Assert.Equal(plaintext, decrypted);
     }
 
     [Fact]
-    public void PrivateEncrypt_WithKeyObject_ThrowsNotImplemented()
+    public void PrivateEncrypt_PublicDecrypt_WithKeyObjects()
     {
-        var (_, privateKey) = crypto.generateKeyPairSync("rsa", null);
-        Assert.Throws<NotImplementedException>(() => crypto.privateEncrypt(privateKey, new byte[64]));
+        var (publicKey, privateKey) = crypto.generateKeyPairSync("rsa", null);
+
+        var plaintext = new byte[32];
+        RandomNumberGenerator.Fill(plaintext);
+
+        // Private encrypt then public decrypt
+        var encrypted = crypto.privateEncrypt(privateKey, plaintext);
+        var decrypted = crypto.publicDecrypt(publicKey, encrypted);
+
+        Assert.Equal(plaintext, decrypted);
     }
 
     [Fact]
-    public void GenerateKey_ThrowsNotImplemented()
+    public void GenerateKey_AES256_GeneratesKey()
     {
-        Assert.Throws<NotImplementedException>(() => crypto.generateKey("aes", new { length = 256 }));
+        var key = crypto.generateKey("aes-256-cbc", new { length = 256 });
+
+        Assert.NotNull(key);
+        Assert.Equal("secret", key.type);
+        Assert.Equal(32, key.symmetricKeySize); // 256 bits = 32 bytes
     }
 
     [Fact]
-    public void GenerateKey_Callback_ThrowsNotImplemented()
+    public void GenerateKey_AES128_GeneratesKey()
+    {
+        var key = crypto.generateKey("aes-128-cbc", new { length = 128 });
+
+        Assert.NotNull(key);
+        Assert.Equal("secret", key.type);
+        Assert.Equal(16, key.symmetricKeySize); // 128 bits = 16 bytes
+    }
+
+    [Fact]
+    public void GenerateKey_Callback_Works()
     {
         Exception? caughtError = null;
+        KeyObject? resultKey = null;
         crypto.generateKey("aes", new { length = 256 }, (err, key) =>
         {
             caughtError = err;
+            resultKey = key;
         });
 
-        Assert.IsType<NotImplementedException>(caughtError);
+        Assert.Null(caughtError);
+        Assert.NotNull(resultKey);
+        Assert.Equal("secret", resultKey.type);
     }
 
     [Fact]
@@ -1769,9 +1788,64 @@ public class CryptoTests
     }
 
     [Fact]
-    public void GenerateKeyPairSync_DH_ThrowsNotImplemented()
+    public void GenerateKeyPairSync_DH_GeneratesKeys()
     {
-        Assert.Throws<NotImplementedException>(() => crypto.generateKeyPairSync("dh", null));
+        var (publicKey, privateKey) = crypto.generateKeyPairSync("dh", null);
+
+        Assert.NotNull(publicKey);
+        Assert.NotNull(privateKey);
+        Assert.Equal("secret", publicKey.type);
+        Assert.Equal("secret", privateKey.type);
+    }
+
+    [Fact]
+    public void DSA_SignAndVerify_Works()
+    {
+        var (publicKey, privateKey) = crypto.generateKeyPairSync("dsa", null);
+
+        var sign = crypto.createSign("sha256");
+        sign.update("test data");
+        var signature = sign.sign(privateKey);
+
+        var verify = crypto.createVerify("sha256");
+        verify.update("test data");
+        var isValid = verify.verify(publicKey, signature);
+
+        Assert.True(isValid);
+    }
+
+    [Fact]
+    public void DSA_SignAndVerify_WithPEM_Works()
+    {
+        var (publicKey, privateKey) = crypto.generateKeyPairSync("dsa", null);
+        var publicPem = publicKey.export().ToString()!;
+        var privatePem = privateKey.export().ToString()!;
+
+        var sign = crypto.createSign("sha256");
+        sign.update("test data");
+        var signature = sign.sign(privatePem, "hex");
+
+        var verify = crypto.createVerify("sha256");
+        verify.update("test data");
+        var isValid = verify.verify(publicPem, signature, "hex");
+
+        Assert.True(isValid);
+    }
+
+    [Fact]
+    public void DSA_Verify_FailsWithWrongData()
+    {
+        var (publicKey, privateKey) = crypto.generateKeyPairSync("dsa", null);
+
+        var sign = crypto.createSign("sha256");
+        sign.update("test data");
+        var signature = sign.sign(privateKey);
+
+        var verify = crypto.createVerify("sha256");
+        verify.update("wrong data");
+        var isValid = verify.verify(publicKey, signature);
+
+        Assert.False(isValid);
     }
 
     // ========== Certificate Tests ==========

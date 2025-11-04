@@ -1,6 +1,12 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Signers;
+using Org.BouncyCastle.OpenSsl;
+using System.IO;
+using Org.BouncyCastle.Math;
 
 namespace Tsonic.NodeApi;
 
@@ -108,10 +114,96 @@ public class Verify : Transform
             }
             catch (Exception)
             {
-                // Try DSA (not fully supported in .NET)
-                throw new NotImplementedException("DSA verification is not yet fully supported");
+                // Try DSA using BouncyCastle
+                try
+                {
+                    using var reader = new StringReader(publicKey);
+                    var pemReader = new PemReader(reader);
+                    var keyObject = pemReader.ReadObject();
+
+                    AsymmetricKeyParameter dsaKey = keyObject switch
+                    {
+                        AsymmetricCipherKeyPair keyPair => keyPair.Public,
+                        AsymmetricKeyParameter key => key,
+                        _ => throw new ArgumentException("Invalid DSA key format")
+                    };
+
+                    return VerifyWithDsa(data, signature, dsaKey, _algorithm);
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
             }
         }
+    }
+
+    private bool VerifyWithDsa(byte[] data, byte[] signature, AsymmetricKeyParameter publicKey, string algorithm)
+    {
+        try
+        {
+            // Hash the data first
+            var digest = CreateBouncyCastleDigest(algorithm);
+            digest.BlockUpdate(data, 0, data.Length);
+            var hash = new byte[digest.GetDigestSize()];
+            digest.DoFinal(hash, 0);
+
+            // Parse DER encoded signature to extract r and s
+            var (r, s) = ParseDerSignature(signature);
+
+            // Verify the signature
+            var signer = new DsaSigner();
+            signer.Init(false, publicKey);
+            return signer.VerifySignature(hash, r, s);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private (BigInteger r, BigInteger s) ParseDerSignature(byte[] signature)
+    {
+        using var ms = new MemoryStream(signature);
+        using var reader = new BinaryReader(ms);
+
+        // Read SEQUENCE tag
+        if (reader.ReadByte() != 0x30)
+            throw new ArgumentException("Invalid DER signature format");
+
+        // Read sequence length
+        reader.ReadByte();
+
+        // Read r
+        if (reader.ReadByte() != 0x02)
+            throw new ArgumentException("Invalid DER signature format - r tag");
+        int rLen = reader.ReadByte();
+        var rBytes = reader.ReadBytes(rLen);
+        var r = new BigInteger(1, rBytes);
+
+        // Read s
+        if (reader.ReadByte() != 0x02)
+            throw new ArgumentException("Invalid DER signature format - s tag");
+        int sLen = reader.ReadByte();
+        var sBytes = reader.ReadBytes(sLen);
+        var s = new BigInteger(1, sBytes);
+
+        return (r, s);
+    }
+
+    private IDigest CreateBouncyCastleDigest(string algorithm)
+    {
+        return algorithm.ToLowerInvariant() switch
+        {
+            "sha1" => new Sha1Digest(),
+            "sha256" => new Sha256Digest(),
+            "sha384" => new Sha384Digest(),
+            "sha512" => new Sha512Digest(),
+            "sha3-256" => new Sha3Digest(256),
+            "sha3-384" => new Sha3Digest(384),
+            "sha3-512" => new Sha3Digest(512),
+            _ => new Sha256Digest() // Default to SHA256
+        };
     }
 
     /// <summary>
@@ -149,11 +241,18 @@ public class Verify : Transform
         if (_finalized)
             throw new InvalidOperationException("Verify already finalized");
 
-        if (publicKey is not PublicKeyObject keyObject)
-            throw new ArgumentException("publicKey must be a PublicKeyObject", nameof(publicKey));
-
         _finalized = true;
         var data = _dataStream.ToArray();
+
+        // Check for DSA key first
+        if (publicKey is DSAPublicKeyObject dsaPublicKey)
+        {
+            var dsaKey = dsaPublicKey.GetKey();
+            return VerifyWithDsa(data, signature, dsaKey, _algorithm);
+        }
+
+        if (publicKey is not PublicKeyObject keyObject)
+            throw new ArgumentException("publicKey must be a PublicKeyObject", nameof(publicKey));
 
         var key = keyObject.GetKey();
         var hashAlgorithm = GetHashAlgorithmName(_algorithm);
