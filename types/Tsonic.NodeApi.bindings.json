@@ -89,6 +89,11 @@
       "kind": "module",
       "assembly": "Tsonic.NodeApi",
       "type": "Tsonic.NodeApi.dns"
+    },
+    "net": {
+      "kind": "module",
+      "assembly": "Tsonic.NodeApi",
+      "type": "Tsonic.NodeApi.net"
     }
   }
 }
