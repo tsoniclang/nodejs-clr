@@ -4,12 +4,12 @@ A Node.js-like standard library for .NET, enabling TypeScript compiled to C# via
 
 ## Overview
 
-Tsonic compiles TypeScript to C# so code can run on .NET. While the [Tsonic Runtime](https://github.com/tsoniclang/tsonic-runtime) provides JavaScript standard library functionality (console, Math, JSON, etc.), **Tsonic.StdLib** implements Node.js-inspired APIs like `fs`, `path`, and `events`.
+Tsonic compiles TypeScript to C# so code can run on .NET. While the [Tsonic Runtime](https://github.com/tsoniclang/tsonic-runtime) provides JavaScript standard library functionality (console, Math, JSON, etc.), **Tsonic.Node** implements Node.js-inspired APIs like `fs`, `path`, and `events`.
 
 **Note:** This library is inspired by Node.js APIs but is **not an exact replica**. It provides similar, familiar APIs that work naturally with .NET while maintaining the Node.js developer experience. APIs may deviate where .NET offers better approaches or where exact Node.js compatibility is impractical.
 
 This repository provides:
-- **C# Implementation** (`Tsonic.StdLib`) - A .NET library with Node.js-inspired APIs optimized for .NET
+- **C# Implementation** (`Tsonic.Node`) - A .NET library with Node.js-inspired APIs optimized for .NET
 - **TypeScript Declarations** (`.d.ts` files) - Type definitions for IDE support
 - **Metadata Files** (`.metadata.json`) - C# semantic information for the Tsonic compiler
 - **Bindings** (`.bindings.json`) - Maps JavaScript module names to CLR types
@@ -25,7 +25,7 @@ npm install --save-dev @tsonic/node-types
 ### For .NET Projects
 
 ```bash
-dotnet add package Tsonic.StdLib
+dotnet add package Tsonic.Node
 ```
 
 ## Usage
@@ -70,7 +70,7 @@ Add to your `tsconfig.json` or Tsonic configuration:
     ],
     "packages": [
       { "name": "Tsonic.Runtime", "version": "1.0.0" },
-      { "name": "Tsonic.StdLib", "version": "1.0.0" }
+      { "name": "Tsonic.Node", "version": "1.0.0" }
     ]
   }
 }
@@ -78,7 +78,7 @@ Add to your `tsconfig.json` or Tsonic configuration:
 
 The Tsonic compiler will:
 1. Load type definitions from `@tsonic/node-types`
-2. Use bindings to map `import "fs"` → `Tsonic.StdLib.fs`
+2. Use bindings to map `import "fs"` → `Tsonic.Node.fs`
 3. Generate C# code that calls the .NET implementation
 4. Add NuGet package references automatically
 
@@ -208,7 +208,7 @@ TypeScript Source Code
          ↓
   .NET Runtime (NativeAOT)
          ↓
-   Tsonic.StdLib (this library)
+   Tsonic.Node (this library)
          ↓
    .NET BCL (File, Path, etc.)
 ```
@@ -217,7 +217,7 @@ TypeScript Source Code
 
 ```
 tsonic-node/
-├── src/Tsonic.StdLib/        # C# implementation
+├── src/Tsonic.Node/        # C# implementation
 │   ├── path.cs                # Path module
 │   ├── fs.cs                  # File system module
 │   └── EventEmitter.cs        # Event emitter
@@ -226,23 +226,23 @@ tsonic-node/
 │   ├── fs.d.ts                # FS type definitions
 │   ├── events-simple.d.ts     # Events type definitions
 │   ├── *.metadata.json        # CLR metadata
-│   ├── Tsonic.StdLib.bindings.json  # Module bindings
+│   ├── Tsonic.Node.bindings.json  # Module bindings
 │   └── index.d.ts             # Main entry point
-├── tests/Tsonic.StdLib.Tests/  # Unit tests
-└── Tsonic.StdLib.sln         # Solution file
+├── tests/Tsonic.Node.Tests/  # Unit tests
+└── Tsonic.Node.sln         # Solution file
 ```
 
 ### Metadata and Bindings
 
-**Bindings** (`Tsonic.StdLib.bindings.json`) map JavaScript imports to C# types:
+**Bindings** (`Tsonic.Node.bindings.json`) map JavaScript imports to C# types:
 
 ```json
 {
   "bindings": {
     "path": {
       "kind": "module",
-      "assembly": "Tsonic.StdLib",
-      "type": "Tsonic.StdLib.path"
+      "assembly": "Tsonic.Node",
+      "type": "Tsonic.Node.path"
     }
   }
 }
@@ -252,9 +252,9 @@ tsonic-node/
 
 ```json
 {
-  "assemblyName": "Tsonic.StdLib",
+  "assemblyName": "Tsonic.Node",
   "types": {
-    "Tsonic.StdLib.path": {
+    "Tsonic.Node.path": {
       "kind": "class",
       "isStatic": true,
       "members": {
@@ -285,7 +285,7 @@ dotnet build
 dotnet test
 
 # Pack NuGet package
-dotnet pack src/Tsonic.StdLib/Tsonic.StdLib.csproj -c Release
+dotnet pack src/Tsonic.Node/Tsonic.Node.csproj -c Release
 
 # Pack npm package
 npm pack
@@ -294,7 +294,7 @@ npm pack
 ### Testing
 
 ```bash
-cd tests/Tsonic.StdLib.Tests
+cd tests/Tsonic.Node.Tests
 dotnet test
 ```
 
@@ -330,12 +330,12 @@ Contributions are welcome! This project follows the patterns established in [tso
 
 ### Adding a New Module
 
-1. Create C# implementation in `src/Tsonic.StdLib/`
+1. Create C# implementation in `src/Tsonic.Node/`
 2. Add TypeScript declarations in `types/`
 3. Create metadata file (`types/<module>.metadata.json`)
-4. Add binding in `types/Tsonic.StdLib.bindings.json`
+4. Add binding in `types/Tsonic.Node.bindings.json`
 5. Add reference in `types/index.d.ts`
-6. Write tests in `tests/Tsonic.StdLib.Tests/`
+6. Write tests in `tests/Tsonic.Node.Tests/`
 
 ## License
 

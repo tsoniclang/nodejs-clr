@@ -44,7 +44,7 @@ private static int _defaultMaxListeners = 10;
 ### Code Organization
 
 ```csharp
-namespace Tsonic.StdLib;
+namespace Tsonic.Node;
 
 /// <summary>
 /// Module-level summary.
@@ -212,9 +212,9 @@ export function basename(path: string, suffix?: string): string;
 
 ```json
 {
-  "assemblyName": "Tsonic.StdLib",
+  "assemblyName": "Tsonic.Node",
   "types": {
-    "Tsonic.StdLib.TypeName": {
+    "Tsonic.Node.TypeName": {
       "kind": "class",
       "isStatic": true,
       "members": {
@@ -250,8 +250,8 @@ export function basename(path: string, suffix?: string): string;
   "bindings": {
     "moduleName": {
       "kind": "module",
-      "assembly": "Tsonic.StdLib",
-      "type": "Tsonic.StdLib.className"
+      "assembly": "Tsonic.Node",
+      "type": "Tsonic.Node.className"
     }
   }
 }
@@ -344,11 +344,11 @@ Assert.Same(expected, actual);
 ### Solution Structure
 
 ```
-Tsonic.StdLib.sln              # Solution file
+Tsonic.Node.sln              # Solution file
 ├── Directory.Build.props        # Shared properties
 ├── src/
-│   └── Tsonic.StdLib/
-│       ├── Tsonic.StdLib.csproj
+│   └── Tsonic.Node/
+│       ├── Tsonic.Node.csproj
 │       ├── module1.cs
 │       └── module2.cs
 ├── types/
@@ -356,11 +356,11 @@ Tsonic.StdLib.sln              # Solution file
 │   ├── module1.metadata.json
 │   ├── module2.d.ts
 │   ├── module2.metadata.json
-│   ├── Tsonic.StdLib.bindings.json
+│   ├── Tsonic.Node.bindings.json
 │   └── index.d.ts
 ├── tests/
-│   └── Tsonic.StdLib.Tests/
-│       ├── Tsonic.StdLib.Tests.csproj
+│   └── Tsonic.Node.Tests/
+│       ├── Tsonic.Node.Tests.csproj
 │       ├── Module1Tests.cs
 │       └── Module2Tests.cs
 ├── docs/                        # Documentation
@@ -438,8 +438,8 @@ Always ignore:
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>Tsonic.StdLib</AssemblyName>
-    <RootNamespace>Tsonic.StdLib</RootNamespace>
+    <AssemblyName>Tsonic.Node</AssemblyName>
+    <RootNamespace>Tsonic.Node</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 </Project>
@@ -487,7 +487,7 @@ Before submitting code:
 - [ ] No compiler warnings (TreatWarningsAsErrors=true)
 - [ ] Metadata JSON is valid and complete
 - [ ] Type definitions match @types/node
-- [ ] Binding added to Tsonic.StdLib.bindings.json
+- [ ] Binding added to Tsonic.Node.bindings.json
 - [ ] Platform-specific code handles Windows and Unix
 - [ ] Temp files cleaned up in tests
 - [ ] Null safety annotations used correctly
