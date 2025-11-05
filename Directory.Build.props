@@ -24,5 +24,9 @@
 
     <!-- Suppress warnings for lowercase method names (JavaScript convention) -->
     <NoWarn>$(NoWarn);CS8981</NoWarn>
+
+    <!-- Centralize build outputs in artifacts/ directory -->
+    <BaseOutputPath>$(MSBuildThisFileDirectory)artifacts\bin\$(MSBuildProjectName)\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)artifacts\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
   </PropertyGroup>
 </Project>
