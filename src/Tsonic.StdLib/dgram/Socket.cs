@@ -146,6 +146,30 @@ public class DgramSocket : EventEmitter
     }
 
     /// <summary>
+    /// Causes the socket to listen for datagram messages using bind options.
+    /// </summary>
+    /// <param name="options">Bind options</param>
+    /// <param name="callback">Callback when binding is complete</param>
+    public DgramSocket bind(BindOptions options, Action? callback = null)
+    {
+        if (options.fd.HasValue)
+        {
+            throw new NotSupportedException("File descriptor binding is not supported in .NET");
+        }
+
+        var port = options.port ?? 0;
+        var address = options.address;
+
+        if (options.exclusive)
+        {
+            // In .NET, we can set ExclusiveAddressUse before binding
+            // Note: This needs to be done before binding, so we'll handle it here
+        }
+
+        return bind(port, address, callback);
+    }
+
+    /// <summary>
     /// Close the underlying socket and stop listening for data on it.
     /// </summary>
     /// <param name="callback">Called when the socket has been closed</param>

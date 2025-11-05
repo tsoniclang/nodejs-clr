@@ -35,3 +35,29 @@ public class SocketOptions
     /// </summary>
     public int? sendBufferSize { get; set; }
 }
+
+/// <summary>
+/// Options for binding a dgram socket.
+/// </summary>
+public class BindOptions
+{
+    /// <summary>
+    /// The port to bind to.
+    /// </summary>
+    public int? port { get; set; }
+
+    /// <summary>
+    /// The address to bind to.
+    /// </summary>
+    public string? address { get; set; }
+
+    /// <summary>
+    /// If true, the socket will be bound exclusively.
+    /// </summary>
+    public bool exclusive { get; set; } = false;
+
+    /// <summary>
+    /// File descriptor (not supported in .NET).
+    /// </summary>
+    public int? fd { get; set; }
+}

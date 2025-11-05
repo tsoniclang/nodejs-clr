@@ -519,4 +519,115 @@ public class DgramTests
 
         socket.close();
     }
+
+    [Fact]
+    public void DropMembership_LeavesMulticastGroup()
+    {
+        var socket = dgram.createSocket("udp4");
+        socket.bind(0, "0.0.0.0");
+        Thread.Sleep(100);
+
+        // Add membership first
+        socket.addMembership("224.0.0.1");
+
+        // Then drop it - should not throw
+        socket.dropMembership("224.0.0.1");
+
+        socket.close();
+    }
+
+    [Fact]
+    public void GetRecvBufferSize_ReturnsBufferSize()
+    {
+        var socket = dgram.createSocket("udp4");
+        socket.bind(0, "127.0.0.1");
+        Thread.Sleep(100);
+
+        var size = socket.getRecvBufferSize();
+        Assert.True(size > 0);
+
+        socket.close();
+    }
+
+    [Fact]
+    public void GetSendBufferSize_ReturnsBufferSize()
+    {
+        var socket = dgram.createSocket("udp4");
+        socket.bind(0, "127.0.0.1");
+        Thread.Sleep(100);
+
+        var size = socket.getSendBufferSize();
+        Assert.True(size > 0);
+
+        socket.close();
+    }
+
+    [Fact]
+    public void SetMulticastInterface_SetsInterface()
+    {
+        var socket = dgram.createSocket("udp4");
+        socket.bind(0, "0.0.0.0");
+        Thread.Sleep(100);
+
+        // Should not throw when setting a valid local interface IP
+        socket.setMulticastInterface("127.0.0.1");
+
+        socket.close();
+    }
+
+    [Fact]
+    public void Bind_WithBindOptions_BindsSuccessfully()
+    {
+        var socket = dgram.createSocket("udp4");
+
+        var options = new BindOptions
+        {
+            port = 0,
+            address = "127.0.0.1"
+        };
+
+        socket.bind(options);
+        Thread.Sleep(100);
+
+        var addr = socket.address();
+        Assert.Equal("127.0.0.1", addr.address);
+        Assert.True(addr.port > 0);
+
+        socket.close();
+    }
+
+    [Fact]
+    public void Bind_WithBindOptionsAndCallback_CallsCallback()
+    {
+        var socket = dgram.createSocket("udp4");
+        bool callbackCalled = false;
+
+        var options = new BindOptions
+        {
+            port = 0,
+            address = "127.0.0.1"
+        };
+
+        socket.bind(options, () => { callbackCalled = true; });
+        Thread.Sleep(100);
+
+        Assert.True(callbackCalled);
+
+        socket.close();
+    }
+
+    [Fact]
+    public void Bind_WithFileDescriptor_ThrowsNotSupported()
+    {
+        var socket = dgram.createSocket("udp4");
+
+        var options = new BindOptions
+        {
+            fd = 123
+        };
+
+        Assert.Throws<NotSupportedException>(() => socket.bind(options));
+
+        socket.close();
+    }
 }
