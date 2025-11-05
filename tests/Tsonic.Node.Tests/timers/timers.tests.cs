@@ -56,10 +56,11 @@ public class TimersTests
     public void setInterval_ShouldExecuteRepeatedlyAsync()
     {
         var count = 0;
-        var timeout = timers.setInterval(() => count++, 30);
+        var timeout = timers.setInterval(() => Interlocked.Increment(ref count), 50);
 
-        Thread.Sleep(120);
+        Thread.Sleep(250);
         timers.clearInterval(timeout);
+        Thread.Sleep(50); // Allow pending callbacks to complete
 
         Assert.True(count >= 3, $"Expected at least 3 executions, got {count}");
     }
@@ -80,10 +81,16 @@ public class TimersTests
     [Fact]
     public void setImmediate_ShouldExecuteCallback()
     {
+        var resetEvent = new ManualResetEventSlim(false);
         var executed = false;
-        var immediate = timers.setImmediate(() => executed = true);
+        var immediate = timers.setImmediate(() =>
+        {
+            executed = true;
+            resetEvent.Set();
+        });
 
-        Thread.Sleep(100);
+        var signaled = resetEvent.Wait(1000);
+        Assert.True(signaled, "setImmediate callback was not called within timeout");
         Assert.True(executed);
     }
 

@@ -2,7 +2,7 @@ using Xunit;
 
 namespace Tsonic.Node.Tests;
 
-public class resolveTests
+public class Path_resolveTests
 {
     [Fact]
     public void resolve_ShouldResolveToAbsolutePath()
