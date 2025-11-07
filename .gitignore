@@ -61,6 +61,12 @@ nunit-*.xml
 .analysis/
 .todos/
 
+# API verification generated files (point-in-time outputs)
+tools/tsonic-node-api.json
+tools/verification-report.md
+tools/COMPREHENSIVE-API-REPORT.md
+tools/VERIFICATION-SUMMARY.md
+
 # Node.js
 node_modules/
 
