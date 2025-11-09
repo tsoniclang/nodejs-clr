@@ -70,6 +70,175 @@ When asked to commit and push changes:
 2. Push to a feature branch (NOT directly to main)
 3. STOP - do not attempt to create pull requests
 
+### GIT SAFETY RULES
+
+#### NEVER DISCARD UNCOMMITTED WORK
+
+**🚨 CRITICAL RULE: NEVER use commands that permanently delete uncommitted changes. 🚨**
+
+These commands cause **PERMANENT DATA LOSS** that cannot be recovered:
+
+- **NEVER** use `git reset --hard`
+- **NEVER** use `git reset --soft`
+- **NEVER** use `git reset --mixed`
+- **NEVER** use `git reset HEAD`
+- **NEVER** use `git checkout -- .`
+- **NEVER** use `git checkout -- <file>`
+- **NEVER** use `git restore` to discard changes
+- **NEVER** use `git clean -fd`
+
+**Why this matters for AI sessions:**
+- Uncommitted work is invisible to future AI sessions
+- Once discarded, changes cannot be recovered
+- AI cannot help fix problems it cannot see
+
+**What to do instead:**
+
+| Situation | ❌ WRONG | ✅ CORRECT |
+|-----------|---------|-----------|
+| Need to switch branches | `git checkout main` (loses changes) | Commit first, then switch |
+| Made mistakes | `git reset --hard` | Commit to temp branch, start fresh |
+| Want clean slate | `git restore .` | Commit current state, then revert |
+| On wrong branch | `git checkout --` | Commit here, then cherry-pick |
+
+**Safe workflow:**
+```bash
+# Always commit before switching context
+git add -A
+git commit -m "wip: current progress on feature X"
+git checkout other-branch
+
+# If commit was wrong, fix with new commit or revert
+git revert HEAD  # Creates new commit that undoes last commit
+# OR
+git commit -m "fix: correct the previous commit"
+```
+
+#### NEVER USE GIT STASH
+
+**🚨 CRITICAL RULE: NEVER use git stash - it hides work and causes data loss. 🚨**
+
+- **NEVER** use `git stash`
+- **NEVER** use `git stash push`
+- **NEVER** use `git stash pop`
+- **NEVER** use `git stash apply`
+- **NEVER** use `git stash drop`
+
+**Why stash is dangerous:**
+- Stashed changes are invisible to AI sessions
+- Easy to forget what's stashed
+- Stash can be accidentally dropped
+- Causes merge conflicts when applied
+- No clear history of when/why stashed
+
+**What to do instead - Use WIP branches:**
+
+```bash
+# Instead of stash, create a timestamped WIP branch
+git checkout -b wip/feature-name-$(date +%Y%m%d-%H%M%S)
+git add -A
+git commit -m "wip: in-progress work on feature X"
+git push -u origin wip/feature-name-$(date +%Y%m%d-%H%M%S)
+
+# Now switch to other work safely
+git checkout main
+# ... do other work ...
+
+# Return to your WIP later
+git checkout wip/feature-name-20251108-084530
+# Continue working...
+
+# When done, squash WIP commits or rebase
+git rebase -i main
+```
+
+**Benefits of WIP branches over stash:**
+- ✅ Work is visible in git history
+- ✅ Work is backed up on remote
+- ✅ AI can see the work in future sessions
+- ✅ Can have multiple WIP branches
+- ✅ Clear timestamps show when work was done
+- ✅ Can share WIP with others if needed
+
+#### NEVER DELETE BRANCHES
+
+**🚨 CRITICAL RULE: NEVER delete branches unless explicitly requested by the user. 🚨**
+
+- **NEVER** use `git branch -d` or `git branch -D`
+- **NEVER** use `git push --delete` or `git push origin :branchname`
+- **NEVER** delete branches "to clean up" or "for tidiness"
+
+**Why:**
+- Branches preserve work history
+- User may want to reference old branches
+- Deleted branches are hard to recover
+- Let the user decide what to keep
+
+**What to do instead:**
+- Leave branches alone after merging
+- User will clean up branches when they want
+- If you think a branch should be deleted, suggest it but don't do it
+
+#### Safe Branch Switching
+
+**ALWAYS commit before switching branches:**
+
+```bash
+# Check current status
+git status
+
+# If there are changes, commit them first
+git add -A
+git commit -m "wip: current state before switching"
+
+# NOW safe to switch
+git checkout other-branch
+```
+
+**If you accidentally started work on wrong branch:**
+
+```bash
+# DON'T use git reset or git checkout --
+# Instead, commit the work here
+git add -A
+git commit -m "wip: work started on wrong branch"
+
+# Create correct branch from current state
+git checkout -b correct-branch-name
+
+# Previous branch will still have the commit
+# You can cherry-pick it or just continue on new branch
+```
+
+#### Recovery from Mistakes
+
+If you realize you made a mistake AFTER committing:
+
+```bash
+# ✅ CORRECT: Create a fix commit
+git commit -m "fix: correct the mistake from previous commit"
+
+# ✅ CORRECT: Revert the bad commit
+git revert HEAD
+
+# ❌ WRONG: Try to undo with reset
+git reset --hard HEAD~1  # NEVER DO THIS - loses history
+```
+
+**If you accidentally committed to main:**
+
+```bash
+# DON'T panic or use git reset
+# Just create a feature branch from current position
+git checkout -b feat/your-feature-name
+
+# Push the branch
+git push -u origin feat/your-feature-name
+
+# When merged, it will fast-forward (no conflicts)
+# Main will catch up to the same commit
+```
+
 ### WORKING DIRECTORIES
 
 **IMPORTANT**: Never create temporary files in the project root or src directories. Use dedicated gitignored directories for different purposes.
@@ -373,6 +542,49 @@ See `api-coverage.md` for detailed analysis.
 - File permissions: Respect system file permissions
 - No shell commands: Pure .NET APIs only (no Process.Start)
 - Input validation: Validate all string inputs (non-null, non-empty when required)
+
+## Git Workflow
+
+### Branch Strategy
+
+1. **NEVER commit to main directly**
+2. **Create feature branches**: `feat/feature-name` or `fix/bug-name`
+3. **Verify branch before commit**: `git branch --show-current`
+
+### Commit Process
+
+1. **Commit before switching contexts**: See Git Safety Rules above
+2. **Run tests**: Ensure all tests pass with `dotnet test`
+3. **Clear commit message**: Describe what and why
+4. **No force push**: Never use `git push --force`
+
+### Workflow Summary
+
+**Critical rules (see detailed Git Safety Rules section above):**
+1. ✅ **ALWAYS commit before switching contexts** - Even if work is incomplete
+2. ✅ **NEVER discard uncommitted work** - Use WIP branches instead
+3. ✅ **NEVER use git stash** - Use timestamped WIP branches
+4. ✅ **NEVER use git reset --hard** - Use git revert for fixes
+5. ✅ **NEVER delete branches** - Let user decide when to clean up
+6. ✅ **Verify branch**: `git branch --show-current` before committing
+7. ✅ **Push WIP branches**: Backup work on remote
+8. ✅ **Use git revert not git reset** - To undo commits
+
+**Standard workflow:**
+```bash
+# 1. Verify you're on correct branch
+git branch --show-current
+
+# 2. Make changes and commit frequently
+git add -A
+git commit -m "feat: descriptive message"
+
+# 3. Test before pushing
+dotnet test
+
+# 4. Push to remote
+git push
+```
 
 ## Future Enhancements
 
