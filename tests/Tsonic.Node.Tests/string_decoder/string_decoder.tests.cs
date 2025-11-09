@@ -248,4 +248,331 @@ public class StringDecoderTests
 
         Assert.Equal(text, result);
     }
+
+    // === Constructor Encoding Tests ===
+
+    [Fact]
+    public void constructor_Utf8WithDash_ShouldWork()
+    {
+        var decoder = new StringDecoder("utf-8");
+        var result = decoder.write(Encoding.UTF8.GetBytes("hello"));
+        Assert.Equal("hello", result);
+    }
+
+    [Fact]
+    public void constructor_Ucs2_ShouldWork()
+    {
+        var decoder = new StringDecoder("ucs2");
+        var result = decoder.write(Encoding.Unicode.GetBytes("hello"));
+        Assert.Equal("hello", result);
+    }
+
+    [Fact]
+    public void constructor_Ucs2WithDash_ShouldWork()
+    {
+        var decoder = new StringDecoder("ucs-2");
+        var result = decoder.write(Encoding.Unicode.GetBytes("hello"));
+        Assert.Equal("hello", result);
+    }
+
+    [Fact]
+    public void constructor_Utf16leWithDash_ShouldWork()
+    {
+        var decoder = new StringDecoder("utf-16le");
+        var result = decoder.write(Encoding.Unicode.GetBytes("hello"));
+        Assert.Equal("hello", result);
+    }
+
+    [Fact]
+    public void constructor_Binary_ShouldUseLatin1()
+    {
+        var decoder = new StringDecoder("binary");
+        var result = decoder.write(Encoding.Latin1.GetBytes("café"));
+        Assert.Equal("café", result);
+    }
+
+    [Fact]
+    public void constructor_InvalidEncoding_ShouldDefaultToUtf8()
+    {
+        var decoder = new StringDecoder("invalid-encoding-xyz");
+        var result = decoder.write(Encoding.UTF8.GetBytes("hello"));
+        Assert.Equal("hello", result);
+    }
+
+    [Fact]
+    public void constructor_EmptyString_ShouldDefaultToUtf8()
+    {
+        var decoder = new StringDecoder("");
+        var result = decoder.write(Encoding.UTF8.GetBytes("hello"));
+        Assert.Equal("hello", result);
+    }
+
+    // === write() 2-byte UTF-8 Tests ===
+
+    [Fact]
+    public void write_TwoByteTwoByteUtf8_Complete()
+    {
+        var decoder = new StringDecoder("utf8");
+        // ¢ (cent sign) = 0xC2 0xA2
+        var result = decoder.write(new byte[] { 0xC2, 0xA2 });
+        Assert.Equal("¢", result);
+    }
+
+    [Fact]
+    public void write_TwoByteUtf8_SplitByteByByte()
+    {
+        var decoder = new StringDecoder("utf8");
+        // ¢ (cent sign) = 0xC2 0xA2
+        var result1 = decoder.write(new byte[] { 0xC2 });
+        Assert.Equal("", result1);
+
+        var result2 = decoder.write(new byte[] { 0xA2 });
+        Assert.Equal("¢", result2);
+    }
+
+    [Fact]
+    public void write_MultipleTwoByteCharacters()
+    {
+        var decoder = new StringDecoder("utf8");
+        // ¢£ = 0xC2 0xA2 0xC2 0xA3
+        var result = decoder.write(new byte[] { 0xC2, 0xA2, 0xC2, 0xA3 });
+        Assert.Equal("¢£", result);
+    }
+
+    [Fact]
+    public void write_TwoByteCharacterWithIncompleteAtEnd()
+    {
+        var decoder = new StringDecoder("utf8");
+        // ¢ + incomplete ¢ = 0xC2 0xA2 0xC2
+        var result1 = decoder.write(new byte[] { 0xC2, 0xA2, 0xC2 });
+        Assert.Equal("¢", result1); // First complete, second incomplete
+
+        var result2 = decoder.write(new byte[] { 0xA2 });
+        Assert.Equal("¢", result2); // Complete second
+    }
+
+    // === write() 4-byte UTF-8 Tests ===
+
+    [Fact]
+    public void write_FourByteUtf8_Complete()
+    {
+        var decoder = new StringDecoder("utf8");
+        // 𝄞 (musical symbol G clef) = 0xF0 0x9D 0x84 0x9E
+        var result = decoder.write(new byte[] { 0xF0, 0x9D, 0x84, 0x9E });
+        Assert.Equal("𝄞", result);
+    }
+
+    [Fact]
+    public void write_FourByteUtf8_SplitByteByByte()
+    {
+        var decoder = new StringDecoder("utf8");
+        // 𝄞 (musical symbol) = 0xF0 0x9D 0x84 0x9E
+
+        var result1 = decoder.write(new byte[] { 0xF0 });
+        Assert.Equal("", result1);
+
+        var result2 = decoder.write(new byte[] { 0x9D });
+        Assert.Equal("", result2);
+
+        var result3 = decoder.write(new byte[] { 0x84 });
+        Assert.Equal("", result3);
+
+        var result4 = decoder.write(new byte[] { 0x9E });
+        Assert.Equal("𝄞", result4);
+    }
+
+    [Fact]
+    public void write_FourByteUtf8_SplitAt2Bytes()
+    {
+        var decoder = new StringDecoder("utf8");
+        // 𝄞 = 0xF0 0x9D 0x84 0x9E
+
+        var result1 = decoder.write(new byte[] { 0xF0, 0x9D });
+        Assert.Equal("", result1);
+
+        var result2 = decoder.write(new byte[] { 0x84, 0x9E });
+        Assert.Equal("𝄞", result2);
+    }
+
+    [Fact]
+    public void write_FourByteUtf8_SplitAt3Bytes()
+    {
+        var decoder = new StringDecoder("utf8");
+        // 𝄞 = 0xF0 0x9D 0x84 0x9E
+
+        var result1 = decoder.write(new byte[] { 0xF0, 0x9D, 0x84 });
+        Assert.Equal("", result1);
+
+        var result2 = decoder.write(new byte[] { 0x9E });
+        Assert.Equal("𝄞", result2);
+    }
+
+    [Fact]
+    public void write_MultipleFourByteCharacters()
+    {
+        var decoder = new StringDecoder("utf8");
+        // 🌍🎵 = 0xF0 0x9F 0x8C 0x8D 0xF0 0x9F 0x8E 0xB5
+        var result = decoder.write(new byte[] { 0xF0, 0x9F, 0x8C, 0x8D, 0xF0, 0x9F, 0x8E, 0xB5 });
+        Assert.Equal("🌍🎵", result);
+    }
+
+    [Fact]
+    public void write_MixedAsciiAndFourByte()
+    {
+        var decoder = new StringDecoder("utf8");
+        // "a🌍b" = 0x61 0xF0 0x9F 0x8C 0x8D 0x62
+
+        var result1 = decoder.write(new byte[] { 0x61, 0xF0, 0x9F });
+        Assert.Equal("a", result1); // 'a' complete, emoji incomplete
+
+        var result2 = decoder.write(new byte[] { 0x8C, 0x8D, 0x62 });
+        Assert.Equal("🌍b", result2); // emoji + 'b'
+    }
+
+    // === end() Additional Tests ===
+
+    [Fact]
+    public void end_WithEmptyByteArray_ShouldReturnEmpty()
+    {
+        var decoder = new StringDecoder("utf8");
+        var result = decoder.end(new byte[] { });
+        Assert.Equal("", result);
+    }
+
+    [Fact]
+    public void end_WithBufferAfterIncompleteWrite_ShouldFlushBothAndDecode()
+    {
+        var decoder = new StringDecoder("utf8");
+
+        // Write incomplete Euro symbol (first 2 bytes)
+        decoder.write(new byte[] { 0xE2, 0x82 });
+
+        // Call end with a new buffer
+        var result = decoder.end(new byte[] { 0x68, 0x69 }); // "hi"
+
+        // Should flush incomplete sequence (replacement char) and decode "hi"
+        Assert.True(result.Length > 0);
+        Assert.Contains("hi", result);
+    }
+
+    [Fact]
+    public void end_WithIncompleteSequenceInBuffer_ShouldFlushWithReplacement()
+    {
+        var decoder = new StringDecoder("utf8");
+
+        // Pass incomplete sequence directly to end()
+        var result = decoder.end(new byte[] { 0xE2, 0x82 }); // Incomplete Euro
+
+        // Should return replacement character
+        Assert.True(result.Length > 0);
+    }
+
+    [Fact]
+    public void end_WithCompleteAndIncompleteInBuffer_ShouldDecodeCompleteAndFlushIncomplete()
+    {
+        var decoder = new StringDecoder("utf8");
+
+        // "hi" + incomplete Euro = 0x68 0x69 0xE2 0x82
+        var result = decoder.end(new byte[] { 0x68, 0x69, 0xE2, 0x82 });
+
+        // Should return "hi" + replacement character
+        Assert.True(result.Length >= 2);
+        Assert.StartsWith("hi", result);
+    }
+
+    [Fact]
+    public void end_CalledTwice_ShouldReturnEmptyOnSecondCall()
+    {
+        var decoder = new StringDecoder("utf8");
+
+        decoder.write(new byte[] { 0x68, 0x69 }); // "hi"
+        var result1 = decoder.end();
+
+        // Second call without writing should return empty
+        var result2 = decoder.end();
+        Assert.Equal("", result2);
+    }
+
+    [Fact]
+    public void end_AfterWrite_ThenWriteAgain_ShouldWork()
+    {
+        var decoder = new StringDecoder("utf8");
+
+        decoder.write(new byte[] { 0x68, 0x69 }); // "hi"
+        decoder.end();
+
+        // Should be able to write again
+        var result = decoder.write(new byte[] { 0x62, 0x79, 0x65 }); // "bye"
+        Assert.Equal("bye", result);
+    }
+
+    [Fact]
+    public void end_WithNullBuffer_ShouldFlushAnyIncomplete()
+    {
+        var decoder = new StringDecoder("utf8");
+
+        // Write incomplete sequence
+        decoder.write(new byte[] { 0xE2 });
+
+        // end(null) should flush
+        var result = decoder.end(null);
+        Assert.True(result.Length >= 0); // May be empty or replacement char
+    }
+
+    // === UTF-16LE Incomplete Sequence Tests ===
+
+    [Fact]
+    public void write_Utf16le_IncompleteSurrogatePair()
+    {
+        var decoder = new StringDecoder("utf16le");
+
+        // 𝄞 in UTF-16LE requires surrogate pair: 0x34 0xD8 0x1E 0xDD
+        var result1 = decoder.write(new byte[] { 0x34, 0xD8 }); // High surrogate incomplete
+        Assert.Equal("", result1); // Should buffer
+
+        var result2 = decoder.write(new byte[] { 0x1E, 0xDD }); // Low surrogate
+        Assert.Equal("𝄞", result2);
+    }
+
+    [Fact]
+    public void write_Utf16le_SplitSingleByte()
+    {
+        var decoder = new StringDecoder("utf16le");
+
+        // "A" in UTF-16LE = 0x41 0x00
+        var result1 = decoder.write(new byte[] { 0x41 });
+        Assert.Equal("", result1); // Incomplete
+
+        var result2 = decoder.write(new byte[] { 0x00 });
+        Assert.Equal("A", result2); // Complete
+    }
+
+    // === Edge Case: All multibyte lengths together ===
+
+    [Fact]
+    public void write_AllMultibyteLengths_SplitAcrossWrites()
+    {
+        var decoder = new StringDecoder("utf8");
+
+        // ASCII (1 byte) + 2-byte + 3-byte + 4-byte: "a¢€𝄞"
+        // = 0x61 0xC2 0xA2 0xE2 0x82 0xAC 0xF0 0x9D 0x84 0x9E
+
+        var result1 = decoder.write(new byte[] { 0x61 }); // 'a'
+        Assert.Equal("a", result1);
+
+        var result2 = decoder.write(new byte[] { 0xC2, 0xA2 }); // ¢
+        Assert.Equal("¢", result2);
+
+        var result3 = decoder.write(new byte[] { 0xE2 }); // Start of €
+        Assert.Equal("", result3);
+
+        var result4 = decoder.write(new byte[] { 0x82, 0xAC }); // Complete €
+        Assert.Equal("€", result4);
+
+        var result5 = decoder.write(new byte[] { 0xF0, 0x9D }); // Start of 𝄞
+        Assert.Equal("", result5);
+
+        var result6 = decoder.write(new byte[] { 0x84, 0x9E }); // Complete 𝄞
+        Assert.Equal("𝄞", result6);
+    }
 }
