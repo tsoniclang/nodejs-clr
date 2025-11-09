@@ -370,7 +370,7 @@ src/Tsonic.Node/          # C# implementation
 
 types/                        # TypeScript view
 ├── path.d.ts                 # Copied from @types/node
-├── fs.d.ts                   # Simplified (sync only)
+├── fs.d.ts                   # Simplified (sync + async, no fs/promises namespace)
 ├── events-simple.d.ts        # Simplified EventEmitter
 ├── *.metadata.json           # Per-module metadata
 ├── Tsonic.Node.bindings.json  # Single bindings file
@@ -396,7 +396,7 @@ tests/Tsonic.Node.Tests/   # xUnit tests
 ### Type Definitions
 
 1. **Match @types/node**: Use official Node.js type definitions as source of truth
-2. **Simplify when needed**: We implement sync-only, so remove async/promise APIs
+2. **Simplify when needed**: We implement both sync and async APIs. Remove features not yet implemented (e.g., streams in some modules, fs/promises namespace)
 3. **Triple-slash references**: Use in `index.d.ts` to aggregate modules
 4. **Module declarations**: Always use `declare module "moduleName"`
 

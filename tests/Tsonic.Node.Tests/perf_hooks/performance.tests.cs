@@ -4,6 +4,7 @@ using System.Threading;
 
 namespace Tsonic.Node.Tests;
 
+[Collection("PerfHooks")]
 public class PerfHooks_performanceTests
 {
     [Fact]
