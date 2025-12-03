@@ -7,7 +7,7 @@ public class FsTestBase : IDisposable
     public FsTestBase()
     {
         // Create a unique test directory for this test run
-        _testDir = Path.Combine(Path.GetTempPath(), $"tsonic-node-tests-{Guid.NewGuid()}");
+        _testDir = Path.Combine(Path.GetTempPath(), $"nodejs-clr-tests-{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDir);
     }
 

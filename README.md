@@ -216,7 +216,7 @@ TypeScript Source Code
 ### File Structure
 
 ```
-tsonic-node/
+nodejs-clr/
 ├── src/Tsonic.Node/        # C# implementation
 │   ├── path.cs                # Path module
 │   ├── fs.cs                  # File system module
@@ -349,5 +349,5 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## Support
 
 - Documentation: https://tsonic.org
-- Issues: https://github.com/tsoniclang/tsonic-node/issues
+- Issues: https://github.com/tsoniclang/nodejs-clr/issues
 - Discussions: https://github.com/tsoniclang/tsonic/discussions

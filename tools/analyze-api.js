@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const api = JSON.parse(fs.readFileSync(path.join(__dirname, 'tsonic-node-api.json'), 'utf-8'));
+const api = JSON.parse(fs.readFileSync(path.join(__dirname, 'nodejs-clr-api.json'), 'utf-8'));
 
 const report = [];
 

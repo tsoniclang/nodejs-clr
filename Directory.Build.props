@@ -16,9 +16,9 @@
     <Company>Tsonic</Company>
     <Copyright>Copyright © 2025 tsoniclang</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/tsoniclang/tsonic-node</RepositoryUrl>
+    <RepositoryUrl>https://github.com/tsoniclang/nodejs-clr</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/tsoniclang/tsonic-node</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/tsoniclang/nodejs-clr</PackageProjectUrl>
     <Description>Node.js API implementation for .NET, enabling TypeScript compiled to C# to use Node.js modules.</Description>
     <PackageTags>tsonic;nodejs;dotnet;typescript</PackageTags>
 

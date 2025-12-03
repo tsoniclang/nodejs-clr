@@ -27,7 +27,7 @@ The verification system consists of two parts:
            │ Generates
            ▼
 ┌─────────────────────┐
-│ tsonic-node-api.json│  ◄────┐
+│ nodejs-clr-api.json│  ◄────┐
 └──────────┬──────────┘        │
            │                   │
            │                   │ Compares
@@ -57,10 +57,10 @@ The verification system consists of two parts:
 
 ```bash
 # Build and run the API extractor
-dotnet run --project tools/Tsonic.Node.ApiExtractor/Tsonic.Node.ApiExtractor.csproj -- tools/tsonic-node-api.json
+dotnet run --project tools/Tsonic.Node.ApiExtractor/Tsonic.Node.ApiExtractor.csproj -- tools/nodejs-clr-api.json
 ```
 
-This generates `tools/tsonic-node-api.json` containing all public APIs from the Tsonic.Node assembly.
+This generates `tools/nodejs-clr-api.json` containing all public APIs from the Tsonic.Node assembly.
 
 ### Step 2: Verify Against Node.js Types
 

@@ -290,7 +290,7 @@ function compareApis(tsonicApi: TsonicApi, nodeModules: Map<string, NodeModule>)
 
 function main() {
   // Load Tsonic API from JSON
-  const tsonicApiPath = path.join(__dirname, '../tsonic-node-api.json');
+  const tsonicApiPath = path.join(__dirname, '../nodejs-clr-api.json');
   const tsonicApi: TsonicApi = JSON.parse(fs.readFileSync(tsonicApiPath, 'utf-8'));
 
   // Parse Node.js type definitions

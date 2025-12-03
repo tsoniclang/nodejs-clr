@@ -20,7 +20,7 @@ class Program
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         });
 
-        var outputPath = args.Length > 0 ? args[0] : "tsonic-node-api.json";
+        var outputPath = args.Length > 0 ? args[0] : "nodejs-clr-api.json";
         File.WriteAllText(outputPath, json);
 
         Console.WriteLine($"Extracted API signatures to {outputPath}");
