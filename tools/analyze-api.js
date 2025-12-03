@@ -179,7 +179,7 @@ const suspectApis = [
   { module: 'path', method: 'matchesGlob' },
 ];
 
-report.push('\nThese methods were found in Tsonic.Node but may not exist in standard Node.js:\n');
+report.push('\nThese methods were found in nodejs but may not exist in standard Node.js:\n');
 for (const { module: moduleName, method: methodName } of suspectApis) {
   const module = staticModules[moduleName];
   if (module) {

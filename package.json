@@ -14,7 +14,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "dotnet build",
-    "pack": "dotnet pack src/Tsonic.Node/Tsonic.Node.csproj -c Release"
+    "pack": "dotnet pack src/nodejs/nodejs.csproj -c Release"
   },
   "repository": {
     "type": "git",

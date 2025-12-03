@@ -1,19 +1,19 @@
-# Tsonic.Node API Verification Tools
+# nodejs API Verification Tools
 
-This directory contains tools for verifying that Tsonic.Node's API signatures match Node.js official type definitions.
+This directory contains tools for verifying that nodejs's API signatures match Node.js official type definitions.
 
 ## Overview
 
 The verification system consists of two parts:
 
-1. **API Extractor** (C#): Uses reflection to extract Tsonic.Node's API signatures
+1. **API Extractor** (C#): Uses reflection to extract nodejs's API signatures
 2. **API Verifier** (TypeScript): Parses Node.js @types definitions and compares against extracted API
 
 ## Workflow
 
 ```
 ┌─────────────────────┐
-│  Tsonic.Node DLL    │
+│  nodejs DLL    │
 │  (C# Assembly)      │
 └──────────┬──────────┘
            │
@@ -53,14 +53,14 @@ The verification system consists of two parts:
 
 ## Usage
 
-### Step 1: Extract Tsonic.Node API
+### Step 1: Extract nodejs API
 
 ```bash
 # Build and run the API extractor
-dotnet run --project tools/Tsonic.Node.ApiExtractor/Tsonic.Node.ApiExtractor.csproj -- tools/nodejs-clr-api.json
+dotnet run --project tools/nodejs.ApiExtractor/nodejs.ApiExtractor.csproj -- tools/nodejs-clr-api.json
 ```
 
-This generates `tools/nodejs-clr-api.json` containing all public APIs from the Tsonic.Node assembly.
+This generates `tools/nodejs-clr-api.json` containing all public APIs from the nodejs assembly.
 
 ### Step 2: Verify Against Node.js Types
 
@@ -74,12 +74,12 @@ This generates `tools/verification-report.md` showing which APIs match, which ar
 
 ## API Extractor (C#)
 
-**Project**: `Tsonic.Node.ApiExtractor`
-**Location**: `tools/Tsonic.Node.ApiExtractor/`
+**Project**: `nodejs.ApiExtractor`
+**Location**: `tools/nodejs.ApiExtractor/`
 
 ### What it does:
 
-- Uses .NET reflection to inspect the Tsonic.Node assembly
+- Uses .NET reflection to inspect the nodejs assembly
 - Extracts all public types, methods, properties
 - Converts C# types to TypeScript-like type names
 - Outputs structured JSON
@@ -134,7 +134,7 @@ This generates `tools/verification-report.md` showing which APIs match, which ar
 ### What it does:
 
 - Uses TypeScript Compiler API to parse @types/node definitions
-- Loads the extracted Tsonic.Node API JSON
+- Loads the extracted nodejs API JSON
 - Compares module-level functions, classes, methods, properties
 - Generates markdown report
 

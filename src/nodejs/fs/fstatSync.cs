@@ -1,0 +1,37 @@
+using System;
+using System.IO;
+
+namespace nodejs;
+
+public static partial class fs
+{
+    /// <summary>
+    /// Synchronously retrieves statistics for a file descriptor.
+    /// </summary>
+    /// <param name="fd">The file descriptor.</param>
+    /// <returns>A Stats object.</returns>
+    public static Stats fstatSync(int fd)
+    {
+        var stream = FileDescriptorManager.Get(fd);
+        if (stream == null)
+            throw new ArgumentException($"Bad file descriptor: {fd}", nameof(fd));
+
+        // Get FileInfo from the stream's name
+        var fileInfo = new FileInfo(stream.Name);
+
+        if (!fileInfo.Exists)
+            throw new FileNotFoundException($"File not found", stream.Name);
+
+        return new Stats
+        {
+            size = fileInfo.Length,
+            mode = Convert.ToInt32("666", 8), // 0o666 in octal = 438 decimal
+            atime = fileInfo.LastAccessTime,
+            mtime = fileInfo.LastWriteTime,
+            ctime = fileInfo.LastWriteTime,
+            birthtime = fileInfo.CreationTime,
+            isFile = !fileInfo.Attributes.HasFlag(FileAttributes.Directory),
+            isDirectory = fileInfo.Attributes.HasFlag(FileAttributes.Directory)
+        };
+    }
+}
