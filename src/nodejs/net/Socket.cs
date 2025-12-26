@@ -19,6 +19,8 @@ public class Socket : Stream
     private NetworkStream? _stream;
     private bool _connecting = false;
     private bool _destroyed = false;
+    private bool _reading = false;
+    private bool _paused = false;
     private int _timeout = 0;
     private bool _allowHalfOpen = false;
 
@@ -108,6 +110,7 @@ public class Socket : Stream
         _client = client;
         _stream = client.GetStream();
         UpdateAddressInfo();
+        StartReading();
     }
 
     /// <summary>
@@ -138,6 +141,7 @@ public class Socket : Stream
                 UpdateAddressInfo();
                 emit("connect");
                 emit("ready");
+                StartReading();
             }
             catch (Exception ex)
             {
@@ -322,7 +326,7 @@ public class Socket : Stream
     /// <returns>The socket itself</returns>
     public Socket pause()
     {
-        // Pause would be implemented with full stream support
+        _paused = true;
         return this;
     }
 
@@ -332,7 +336,7 @@ public class Socket : Stream
     /// <returns>The socket itself</returns>
     public Socket resume()
     {
-        // Resume would be implemented with full stream support
+        _paused = false;
         return this;
     }
 
@@ -424,6 +428,84 @@ public class Socket : Stream
     {
         // Not applicable in .NET managed context
         return this;
+    }
+
+    /// <summary>
+    /// Starts the asynchronous read loop to emit "data" events.
+    /// </summary>
+    private void StartReading()
+    {
+        if (_reading || _stream == null) return;
+        _reading = true;
+
+        Task.Run(async () =>
+        {
+            var buffer = new byte[65536]; // 64KB buffer
+            try
+            {
+                while (!_destroyed && _stream != null && _client?.Connected == true)
+                {
+                    // Wait while paused
+                    while (_paused && !_destroyed)
+                    {
+                        await Task.Delay(10);
+                    }
+
+                    if (_destroyed) break;
+
+                    int bytesReadCount;
+                    try
+                    {
+                        bytesReadCount = await _stream.ReadAsync(buffer, 0, buffer.Length);
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // Stream was closed
+                        break;
+                    }
+                    catch (System.IO.IOException)
+                    {
+                        // Connection reset or closed
+                        break;
+                    }
+
+                    if (bytesReadCount == 0)
+                    {
+                        // End of stream - connection closed by remote
+                        emit("end");
+                        if (!_allowHalfOpen)
+                        {
+                            end();
+                        }
+                        break;
+                    }
+
+                    bytesRead += bytesReadCount;
+
+                    // Create a Buffer with the received data
+                    var data = new byte[bytesReadCount];
+                    System.Array.Copy(buffer, 0, data, 0, bytesReadCount);
+                    var nodeBuffer = Buffer.from(data);
+
+                    emit("data", nodeBuffer);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!_destroyed)
+                {
+                    emit("error", ex);
+                }
+            }
+            finally
+            {
+                _reading = false;
+                if (!_destroyed)
+                {
+                    emit("close", false);
+                }
+            }
+        });
     }
 
     private void UpdateAddressInfo()
