@@ -137,20 +137,16 @@ public partial class Server : EventEmitter
             .SuppressStatusMessages(true)
             .Configure(app =>
             {
-                // Main request handler
-                app.Run(async (context) =>
+                // Main request handler - use async to properly await response writes
+                app.Run(async context =>
                 {
                     var req = new IncomingMessage(context.Request);
                     var res = new ServerResponse(context.Response);
 
-                    // Emit 'request' event
+                    // Emit 'request' event - registered listeners will handle the request
                     emit("request", req, res);
 
-                    // If response wasn't completed, wait for it
-                    if (!context.Response.HasStarted)
-                    {
-                        await res.end();
-                    }
+                    await context.Response.CompleteAsync();
                 });
             })
             .Build();
@@ -179,7 +175,7 @@ public partial class Server : EventEmitter
     /// <param name="port">The port number.</param>
     /// <param name="callback">Optional callback when server has been started.</param>
     /// <returns>The server instance for chaining.</returns>
-    public Server listen(int port, Action? callback = null)
+    public Server listen(int port, Action? callback)
     {
         return listen(port, null, null, callback);
     }

@@ -28,7 +28,7 @@ public class HttpServerTests
                 { "Content-Type", "text/plain" }
             });
 
-            res.end("Hello World").Wait();
+            res.end("Hello World");
         });
 
         server.listen(port, (Action?)null);
@@ -69,7 +69,7 @@ public class HttpServerTests
                 { "X-Custom-Header", "test-value" }
             });
 
-            res.end("{\"status\":\"ok\"}").Wait();
+            res.end("{\"status\":\"ok\"}");
         });
 
         server.listen(port, (Action?)null);
@@ -103,7 +103,7 @@ public class HttpServerTests
         var server = http.createServer((req, res) =>
         {
             receivedUserAgent = req.headers.GetValueOrDefault("user-agent");
-            res.end("OK").Wait();
+            res.end("OK");
         });
 
         server.listen(port, (Action?)null);
@@ -132,7 +132,7 @@ public class HttpServerTests
     {
         // Arrange
         var port = 18083;
-        var server = http.createServer((req, res) => res.end("OK").Wait());
+        var server = http.createServer((req, res) => res.end("OK"));
 
         // Assert before
         Assert.False(server.listening);
@@ -157,7 +157,7 @@ public class HttpServerTests
     {
         // Arrange
         var port = 18084;
-        var server = http.createServer((req, res) => res.end("OK").Wait());
+        var server = http.createServer((req, res) => res.end("OK"));
 
         server.listen(port, (Action?)null);
 
