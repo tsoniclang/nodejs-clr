@@ -173,41 +173,46 @@ public partial class ServerResponse : EventEmitter
 
     /// <summary>
     /// Sends a chunk of the response body.
+    /// Writes synchronously using blocking wait to match Node.js semantics.
     /// </summary>
     /// <param name="chunk">The data to write.</param>
     /// <param name="encoding">Optional encoding (ignored, always UTF-8).</param>
     /// <param name="callback">Optional callback when chunk is flushed.</param>
     /// <returns>True if entire data was flushed successfully.</returns>
-    public async Task<bool> write(string chunk, string? encoding = null, Action? callback = null)
+    public bool write(string chunk, string? encoding = null, Action? callback = null)
     {
         if (!_headersSent)
         {
             _headersSent = true;
         }
 
-        await _response.WriteAsync(chunk);
+        // Write synchronously - use Task.Run to avoid sync-over-async deadlock
+        Task.Run(async () => await _response.WriteAsync(chunk)).GetAwaiter().GetResult();
         callback?.Invoke();
         return true;
     }
 
     /// <summary>
     /// Signals that all response headers and body have been sent.
+    /// Node.js idiomatic: synchronous from caller's perspective, returns this for chaining.
     /// </summary>
     /// <param name="chunk">Optional final chunk to send.</param>
     /// <param name="encoding">Optional encoding (ignored, always UTF-8).</param>
     /// <param name="callback">Optional callback when response is finished.</param>
-    public async Task end(string? chunk = null, string? encoding = null, Action? callback = null)
+    /// <returns>This response for chaining.</returns>
+    public ServerResponse end(string? chunk = null, string? encoding = null, Action? callback = null)
     {
+        // Write synchronously - use Task.Run to avoid sync-over-async deadlock
+        // Server will call CompleteAsync after emit returns
         if (chunk != null)
         {
-            await write(chunk, encoding);
+            Task.Run(async () => await _response.WriteAsync(chunk)).GetAwaiter().GetResult();
         }
 
-        await _response.CompleteAsync();
         _finished = true;
-
         emit("finish");
         callback?.Invoke();
+        return this;
     }
 
     /// <summary>
@@ -230,12 +235,12 @@ public partial class ServerResponse : EventEmitter
     /// <summary>
     /// Flushes the response headers.
     /// </summary>
-    public async Task flushHeaders()
+    public void flushHeaders()
     {
         if (!_headersSent)
         {
             _headersSent = true;
-            await _response.StartAsync();
+            _ = _response.StartAsync();
         }
     }
 }
