@@ -5,7 +5,7 @@
 ### New project
 
 ```bash
-tsonic project init --nodejs
+tsonic init --nodejs
 ```
 
 ### Existing project
@@ -16,9 +16,11 @@ tsonic add nodejs
 
 That will:
 
-- Add the `@tsonic/nodejs` bindings package to your `package.json` (for `tsc` typechecking)
-- Copy the `nodejs.dll` runtime library into your project (so the generated C# can reference it)
-- Update your `tsonic.json` as needed
+- Install the `@tsonic/nodejs` bindings package in your workspace (`package.json`) for `tsc` typechecking
+- Copy the runtime DLLs into `libs/`:
+  - `libs/Tsonic.JSRuntime.dll` (NodeJS depends on JSRuntime)
+  - `libs/nodejs.dll`
+- Add those DLLs to `tsonic.workspace.json` under `dotnet.libraries`
 
 ## Minimal Example
 
