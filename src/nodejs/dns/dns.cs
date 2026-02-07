@@ -15,6 +15,8 @@ namespace nodejs;
 /// </summary>
 public static class dns
 {
+    private static readonly DnsPromises _promises = new();
+
     // ==================== Constants ====================
 
     /// <summary>
@@ -84,6 +86,11 @@ public static class dns
     public const string CANCELLED = "ECANCELLED";
 
     private static string _defaultResultOrder = "verbatim";
+
+    /// <summary>
+    /// Promise-based dns APIs.
+    /// </summary>
+    public static DnsPromises promises => _promises;
 
     // ==================== lookup ====================
 

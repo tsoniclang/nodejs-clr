@@ -10,6 +10,13 @@ namespace nodejs;
 /// </summary>
 public static class readline
 {
+    private static readonly ReadlinePromises _promises = new();
+
+    /// <summary>
+    /// Promise-based readline helpers.
+    /// </summary>
+    public static ReadlinePromises promises => _promises;
+
     /// <summary>
     /// Creates a new readline.Interface instance.
     /// </summary>
@@ -190,6 +197,22 @@ public static class readline
             callback?.Invoke();
             return false;
         }
+    }
+
+    /// <summary>
+    /// Configures a readable stream to emit keypress events on the given interface.
+    /// </summary>
+    public static void emitKeypressEvents(Readable stream, Interface? rl = null)
+    {
+        if (stream == null)
+            throw new ArgumentNullException(nameof(stream));
+
+        stream.on("data", (Action<object?>)(chunk =>
+        {
+            if (rl == null) return;
+            var key = chunk?.ToString() ?? string.Empty;
+            rl.emit("keypress", key, key);
+        }));
     }
 
     /// <summary>
