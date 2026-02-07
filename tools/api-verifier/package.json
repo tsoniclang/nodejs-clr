@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "report:gaps": "tsx report-node-gaps.ts",
     "verify": "tsx verify.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -155,5 +155,3 @@ For instance classes (like `EventEmitter`, `Buffer`):
 - Compares Tsonic properties against Node.js properties
 
 ## Output
-
-###Human: i hve to leave. commit and push
