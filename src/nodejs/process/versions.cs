@@ -8,12 +8,12 @@ public class ProcessVersions
     /// <summary>
     /// The Node.js version.
     /// </summary>
-    public string node { get; set; } = "20.0.0";
+    public string node { get; set; } = "24.0.0";
 
     /// <summary>
     /// The V8 JavaScript engine version.
     /// </summary>
-    public string v8 { get; set; } = "11.3.244.8";
+    public string v8 { get; set; } = "0.0.0";
 
     /// <summary>
     /// The .NET runtime version (Tsonic-specific).
@@ -21,9 +21,9 @@ public class ProcessVersions
     public string dotnet { get; set; } = Environment.Version.ToString();
 
     /// <summary>
-    /// The Tsonic compiler version (Tsonic-specific).
+    /// The Tsonic toolchain version (Tsonic-specific).
     /// </summary>
-    public string tsonic { get; set; } = "1.0.0";
+    public string tsonic { get; set; } = "0.0.34";
 }
 
 public static partial class process

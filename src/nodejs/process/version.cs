@@ -6,5 +6,5 @@ public static partial class process
     /// The Node.js version string.
     /// For Tsonic, this reports a compatible Node.js version.
     /// </summary>
-    public static string version => "v20.0.0-tsonic";
+    public static string version => "v24.0.0-tsonic";
 }

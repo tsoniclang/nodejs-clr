@@ -10,7 +10,7 @@ Install and enable the bindings package:
 
 ```bash
 # new project
-tsonic project init --nodejs
+tsonic init --nodejs
 
 # existing project
 tsonic add nodejs
@@ -44,6 +44,12 @@ Build:
 
 ```bash
 dotnet build
+```
+
+If `dotnet build` fails with "Build FAILED" but no errors (some sandboxed environments block MSBuild node sockets), try:
+
+```bash
+dotnet build -- -maxcpucount:1
 ```
 
 Test:
