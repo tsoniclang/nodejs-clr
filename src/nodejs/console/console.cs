@@ -12,8 +12,14 @@ public static class console
 {
     private static readonly Dictionary<string, int> _counters = new Dictionary<string, int>();
     private static readonly Dictionary<string, Stopwatch> _timers = new Dictionary<string, Stopwatch>();
+    private static readonly ConsoleConstructor _consoleCtor = new();
     private static int _groupIndentation = 0;
     private static readonly int _groupIndentationSize = 2;
+
+    /// <summary>
+    /// Console constructor-like export for compatibility.
+    /// </summary>
+    public static ConsoleConstructor Console => _consoleCtor;
 
     /// <summary>
     /// Writes a message if value is falsy or omitted. It only writes a message and does not otherwise affect execution.
@@ -41,7 +47,7 @@ public static class console
     {
         try
         {
-            Console.Clear();
+            global::System.Console.Clear();
         }
         catch
         {
@@ -269,7 +275,7 @@ public static class console
             var indent = new string(' ', _groupIndentation * _groupIndentationSize);
             message = indent + message;
         }
-        Console.WriteLine(message);
+        global::System.Console.WriteLine(message);
     }
 
     private static void Error(string message)
@@ -279,7 +285,7 @@ public static class console
             var indent = new string(' ', _groupIndentation * _groupIndentationSize);
             message = indent + message;
         }
-        Console.Error.WriteLine(message);
+        global::System.Console.Error.WriteLine(message);
     }
 
     private static string FormatMessage(string? message, object[] optionalParams)
@@ -364,3 +370,43 @@ public static class console
             return $"{elapsed.TotalMinutes:F2}m";
     }
 }
+
+#pragma warning disable CS1591
+
+public class ConsoleConstructor
+{
+    public ConsoleConstructor(object? stdout = null, object? stderr = null, bool ignoreErrors = true, object? colorMode = null, int? inspectOptions = null, bool groupIndentation = true)
+    {
+        _ = stdout;
+        _ = stderr;
+        _ = ignoreErrors;
+        _ = colorMode;
+        _ = inspectOptions;
+        _ = groupIndentation;
+    }
+
+    public void assert(bool value, string? message = null, params object[] optionalParams) => console.assert(value, message, optionalParams);
+    public void clear() => console.clear();
+    public void count(string? label = null) => console.count(label);
+    public void countReset(string? label = null) => console.countReset(label);
+    public void debug(object? message = null, params object[] optionalParams) => console.debug(message, optionalParams);
+    public void dir(object? obj, params object[] options) => console.dir(obj, options);
+    public void dirxml(params object[] data) => console.dirxml(data);
+    public void error(object? message = null, params object[] optionalParams) => console.error(message, optionalParams);
+    public void group(params object[] label) => console.group(label);
+    public void groupCollapsed(params object[] label) => console.groupCollapsed(label);
+    public void groupEnd() => console.groupEnd();
+    public void info(object? message = null, params object[] optionalParams) => console.info(message, optionalParams);
+    public void log(object? message = null, params object[] optionalParams) => console.log(message, optionalParams);
+    public void profile(string? label = null) => console.profile(label);
+    public void profileEnd(string? label = null) => console.profileEnd(label);
+    public void table(object? tabularData, string[]? properties = null) => console.table(tabularData, properties);
+    public void time(string? label = null) => console.time(label);
+    public void timeEnd(string? label = null) => console.timeEnd(label);
+    public void timeLog(string? label = null, params object[] data) => console.timeLog(label, data);
+    public void timeStamp(string? label = null) => console.timeStamp(label);
+    public void trace(object? message = null, params object[] optionalParams) => console.trace(message, optionalParams);
+    public void warn(object? message = null, params object[] optionalParams) => console.warn(message, optionalParams);
+}
+
+#pragma warning restore CS1591

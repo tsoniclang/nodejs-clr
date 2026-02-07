@@ -2,6 +2,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Text.Json;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 
 namespace nodejs;
 
@@ -194,6 +195,55 @@ public static partial class assert
                 throw ex;
             }
             throw new AssertionError($"ifError got unwanted exception: {value}", value, null, "ifError");
+        }
+    }
+
+    /// <summary>
+    /// Strict assertion alias.
+    /// </summary>
+    public static void strict(object? actual, object? expected, string? message = null)
+    {
+        strictEqual(actual, expected, message);
+    }
+
+    /// <summary>
+    /// Expects the async function fn to reject.
+    /// </summary>
+    public static async Task rejects(Func<Task> fn, string? message = null)
+    {
+        if (fn == null)
+            throw new ArgumentNullException(nameof(fn));
+
+        try
+        {
+            await fn().ConfigureAwait(false);
+            throw new AssertionError(message ?? "Missing expected rejection", null, null, "rejects");
+        }
+        catch (AssertionError)
+        {
+            throw;
+        }
+        catch
+        {
+            // Expected exception was thrown
+        }
+    }
+
+    /// <summary>
+    /// Expects the async function fn not to reject.
+    /// </summary>
+    public static async Task doesNotReject(Func<Task> fn, string? message = null)
+    {
+        if (fn == null)
+            throw new ArgumentNullException(nameof(fn));
+
+        try
+        {
+            await fn().ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            throw new AssertionError(message ?? $"Got unwanted rejection: {ex.Message}", null, null, "doesNotReject");
         }
     }
 

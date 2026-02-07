@@ -9,6 +9,13 @@ namespace nodejs;
 /// </summary>
 public static class timers
 {
+    private static readonly TimersPromises _promises = new();
+
+    /// <summary>
+    /// Promise-based timer APIs.
+    /// </summary>
+    public static TimersPromises promises => _promises;
+
     /// <summary>
     /// Schedules execution of a one-time callback after delay milliseconds.
     /// </summary>
