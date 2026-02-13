@@ -7,7 +7,7 @@
 
     <!-- Package settings -->
     <IsPackable>true</IsPackable>
-    <PackageId>nodejs</PackageId>
+    <PackageId>Tsonic.Nodejs</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

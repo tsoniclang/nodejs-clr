@@ -10,10 +10,11 @@ Install and enable the bindings package:
 
 ```bash
 # new project
-tsonic init --nodejs
+tsonic init
+tsonic add npm @tsonic/nodejs
 
 # existing project
-tsonic add nodejs
+tsonic add npm @tsonic/nodejs
 ```
 
 Then import Node-style modules from `@tsonic/nodejs/index.js`:
