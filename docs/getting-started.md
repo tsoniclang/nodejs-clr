@@ -5,22 +5,24 @@
 ### New project
 
 ```bash
-tsonic init --nodejs
+tsonic init
+tsonic add npm @tsonic/nodejs
 ```
 
 ### Existing project
 
 ```bash
-tsonic add nodejs
+tsonic add npm @tsonic/nodejs
 ```
 
 That will:
 
 - Install the `@tsonic/nodejs` bindings package in your workspace (`package.json`) for `tsc` typechecking
-- Copy the runtime DLLs into `libs/`:
-  - `libs/Tsonic.JSRuntime.dll` (NodeJS depends on JSRuntime)
-  - `libs/nodejs.dll`
-- Add those DLLs to `tsonic.workspace.json` under `dotnet.libraries`
+- Apply the package’s `.NET` dependency manifest (`tsonic.bindings.json`) to `tsonic.workspace.json`
+  - Adds the required `dotnet.frameworkReferences` / `dotnet.packageReferences`
+  - Installs any additional `types` packages referenced by the manifest
+
+Then run `tsonic restore` (or just `tsonic build`, which will restore via `dotnet`) to materialize the .NET dependencies.
 
 ## Minimal Example
 
