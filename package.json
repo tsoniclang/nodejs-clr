@@ -1,5 +1,6 @@
 {
   "name": "@tsonic/node-types",
+  "private": true,
   "version": "1.0.0",
   "description": "TypeScript definitions and bindings for Node.js API implementation on .NET",
   "main": "types/index.d.ts",
