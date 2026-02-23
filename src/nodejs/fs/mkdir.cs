@@ -30,4 +30,28 @@ public static partial class fs
             }
         });
     }
+
+    /// <summary>
+    /// Asynchronously creates a directory using options object semantics.
+    /// </summary>
+    /// <param name="path">The directory path to create.</param>
+    /// <param name="options">mkdir options ({ recursive?, mode? }).</param>
+    /// <returns>A promise that resolves when the directory is created.</returns>
+    public static Task mkdir(string path, MkdirOptions? options)
+    {
+        return Task.Run(() => mkdirSync(path, (object?)options));
+    }
+
+    /// <summary>
+    /// Asynchronously creates a directory using object options semantics.
+    /// Accepts either a boolean recursive flag or an options object with
+    /// { recursive?, mode? }.
+    /// </summary>
+    /// <param name="path">The directory path to create.</param>
+    /// <param name="options">A recursive flag or options object.</param>
+    /// <returns>A promise that resolves when the directory is created.</returns>
+    public static Task mkdir(string path, object? options)
+    {
+        return Task.Run(() => mkdirSync(path, options));
+    }
 }

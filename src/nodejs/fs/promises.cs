@@ -27,6 +27,8 @@ public class FsPromises
     public Task cp(string src, string dest, bool recursive = false) => fs.cp(src, dest, recursive);
     public Task<Stats> fstat(int fd) => fs.fstat(fd);
     public Task mkdir(string path, bool recursive = false) => fs.mkdir(path, recursive);
+    public Task mkdir(string path, MkdirOptions? options) => fs.mkdir(path, options);
+    public Task mkdir(string path, object? options) => fs.mkdir(path, options);
     public Task<int> open(string path, string flags, int? mode = null) => fs.open(path, flags, mode);
     public Task<int> read(int fd, byte[] buffer, int offset, int length, int? position) => fs.read(fd, buffer, offset, length, position);
     public Task<string[]> readdir(string path, bool withFileTypes = false) => fs.readdir(path, withFileTypes);
