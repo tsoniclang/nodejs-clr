@@ -33,9 +33,12 @@ class Program
     {
         var api = new ApiDefinition { Modules = new Dictionary<string, ModuleDefinition>() };
 
-        // Get all public types in nodejs namespace
+        // Get all public types in nodejs namespaces (e.g., nodejs, nodejs.Http)
         var types = assembly.GetTypes()
-            .Where(t => t.Namespace == "nodejs" && t.IsPublic)
+            .Where(t =>
+                t.IsPublic &&
+                t.Namespace != null &&
+                (t.Namespace == "nodejs" || t.Namespace.StartsWith("nodejs.", StringComparison.Ordinal)))
             .OrderBy(t => t.Name);
 
         foreach (var type in types)
@@ -43,6 +46,7 @@ class Program
             var module = new ModuleDefinition
             {
                 Name = type.Name,
+                Namespace = type.Namespace ?? "",
                 IsClass = type.IsClass,
                 IsStatic = type.IsAbstract && type.IsSealed,
                 Methods = new List<MethodSignature>(),
@@ -165,6 +169,7 @@ class ApiDefinition
 class ModuleDefinition
 {
     public string Name { get; set; } = "";
+    public string Namespace { get; set; } = "";
     public bool IsClass { get; set; }
     public bool IsStatic { get; set; }
     public List<MethodSignature> Methods { get; set; } = new();

@@ -71,7 +71,7 @@ interface PropertyInfo {
 }
 
 function parseNodeTypes(moduleName: string): NodeModule | null {
-  const typesPath = path.join(__dirname, `../../node_modules/@types/node/${moduleName}.d.ts`);
+  const typesPath = path.join(__dirname, `../../../node_modules/@types/node/${moduleName}.d.ts`);
 
   if (!fs.existsSync(typesPath)) {
     return null;
@@ -290,7 +290,7 @@ function compareApis(tsonicApi: TsonicApi, nodeModules: Map<string, NodeModule>)
 
 function main() {
   // Load Tsonic API from JSON
-  const tsonicApiPath = path.join(__dirname, '../nodejs-clr-api.json');
+  const tsonicApiPath = path.join(__dirname, '../../nodejs-clr-api.json');
   const tsonicApi: TsonicApi = JSON.parse(fs.readFileSync(tsonicApiPath, 'utf-8'));
 
   // Parse Node.js type definitions
@@ -308,7 +308,7 @@ function main() {
   const report = compareApis(tsonicApi, nodeModules);
 
   // Write report
-  const reportPath = path.join(__dirname, '../verification-report.md');
+  const reportPath = path.join(__dirname, '../../verification-report.md');
   fs.writeFileSync(reportPath, report);
 
   console.log(`Verification report generated: ${reportPath}`);

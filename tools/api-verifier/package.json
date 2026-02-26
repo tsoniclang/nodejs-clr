@@ -4,8 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "report:gaps": "tsx report-node-gaps.ts",
-    "verify": "tsx verify.ts",
+    "extract:clr": "dotnet run --project ../nodejs.ApiExtractor/nodejs.ApiExtractor.csproj -- ../nodejs-clr-api.json",
+    "extract:node-runtime": "tsx reflection/extract-node-runtime.ts",
+    "compare:reflection": "tsx reflection/compare-reflection.ts",
+    "verify:reflection": "npm run extract:clr && npm run extract:node-runtime && npm run compare:reflection",
+    "report:gaps": "tsx dts/report-node-gaps.ts",
+    "verify": "tsx dts/verify.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

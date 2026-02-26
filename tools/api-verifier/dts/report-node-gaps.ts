@@ -49,10 +49,10 @@ interface ModuleDiff {
   notes: string[];
 }
 
-const DEFAULT_NODE_TYPES_INDEX = path.resolve(__dirname, "../../node_modules/@types/node/index.d.ts");
-const DEFAULT_NODE_TYPES_DIR = path.resolve(__dirname, "../../node_modules/@types/node");
-const DEFAULT_TSONIC_NODEJS_VERSIONS10 = path.resolve(__dirname, "../../../nodejs/versions/10");
-const DEFAULT_NODEJS_CLR_SRC_DIR = path.resolve(__dirname, "../../src/nodejs");
+const DEFAULT_NODE_TYPES_INDEX = path.resolve(__dirname, "../../../node_modules/@types/node/index.d.ts");
+const DEFAULT_NODE_TYPES_DIR = path.resolve(__dirname, "../../../node_modules/@types/node");
+const DEFAULT_TSONIC_NODEJS_VERSIONS10 = path.resolve(__dirname, "../../../../nodejs/versions/10");
+const DEFAULT_NODEJS_CLR_SRC_DIR = path.resolve(__dirname, "../../../src/nodejs");
 
 const IGNORE_NODE_TYPES_FILES = new Set([
   "index",
@@ -714,7 +714,7 @@ function main() {
     diffs.push(computeModuleDiff(nodeApi.get(m.nodeModule), m, tsonicIndex, tsonicHttp, sourceTypesByModule));
   }
 
-  const outDir = path.resolve(__dirname, ".."); // tools/
+  const outDir = path.resolve(__dirname, "../.."); // tools/
   writeReportFiles(outDir, nodeTypesPkg.version, tsonicPkg.version, nodeModules, diffs);
 
   console.log(`Wrote reports:\n- ${path.join(outDir, "VERIFICATION-SUMMARY.md")}\n- ${path.join(outDir, "verification-report.md")}`);
