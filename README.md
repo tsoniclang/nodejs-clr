@@ -10,21 +10,23 @@ Install and enable the bindings package:
 
 ```bash
 # new project
-tsonic init
-tsonic add npm @tsonic/nodejs
+npx --yes tsonic@latest init --surface nodejs
+npx --yes tsonic@latest add npm @tsonic/nodejs
 
 # existing project
-tsonic add npm @tsonic/nodejs
+npx --yes tsonic@latest add npm @tsonic/nodejs
 ```
 
-Then import Node-style modules from `@tsonic/nodejs/index.js`:
+Then write natural Node-style code:
 
 ```ts
-import { console, fs, path } from "@tsonic/nodejs/index.js";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 export function main(): void {
-  console.log(path.join("a", "b", "c"));
-  console.log(fs.readFileSync("./README.md", "utf-8"));
+  const p = join("a", "b", "c");
+  console.log(p);
+  console.log(readFileSync("./README.md", "utf-8"));
 }
 ```
 
@@ -33,6 +35,8 @@ Some namespaces are emitted as separate ESM entry points (for example `nodejs.Ht
 ```ts
 import { http } from "@tsonic/nodejs/nodejs.Http.js";
 ```
+
+Direct imports from `@tsonic/nodejs/index.js` remain supported.
 
 Documentation:
 
