@@ -1,40 +1,42 @@
 # Importing Modules
 
-## Importing from `@tsonic/nodejs/index.js`
+## Preferred in `--surface nodejs`: Node-style specifiers
 
-Most Node-style modules are exported as named values from the package root entry point:
+With Node surface enabled, import using Node module names:
 
 ```ts
-import { console, fs, path, process, crypto } from "@tsonic/nodejs/index.js";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import * as process from "node:process";
 ```
 
-Types that are part of those modules are also exported from the root entry point:
+Bare aliases are also supported:
+
+```ts
+import { readFileSync } from "fs";
+import { join } from "path";
+```
+
+## Direct package imports remain supported
+
+You can still import directly from `@tsonic/nodejs/index.js`:
+
+```ts
+import { fs, path, process, crypto } from "@tsonic/nodejs/index.js";
+```
+
+Types exported from the package root are also available there:
 
 ```ts
 import { EventEmitter } from "@tsonic/nodejs/index.js";
 ```
 
-## Importing submodules (namespaces)
+## Submodules (separate namespaces)
 
-Some namespaces are emitted as separate entry points. For example, HTTP lives in the `nodejs.Http` namespace:
+Some namespaces are emitted as separate entry points. Example:
 
 ```ts
 import { http, IncomingMessage, ServerResponse } from "@tsonic/nodejs/nodejs.Http.js";
 ```
 
-## Do not import Node builtins (`"fs"`, `"path"`, ...)
-
-Tsonic projects compile to .NET and do **not** run on Node.js. You should not write:
-
-```ts
-// ❌ Not supported
-import * as fs from "fs";
-import * as path from "path";
-```
-
-Instead import from `@tsonic/nodejs/index.js`:
-
-```ts
-// ✅ Supported
-import { fs, path } from "@tsonic/nodejs/index.js";
-```
+`node:http` is currently not mapped by the surface alias set.
