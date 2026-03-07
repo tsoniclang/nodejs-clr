@@ -58,4 +58,18 @@ public class statSyncTests : FsTestBase
         Assert.False(stats.IsFIFO());
         Assert.False(stats.IsSocket());
     }
+
+    [Fact]
+    public void statSync_ShouldExposeUnixMillisecondTimestamps()
+    {
+        var filePath = GetTestPath("stats-time.txt");
+        File.WriteAllText(filePath, "content");
+
+        var stats = fs.statSync(filePath);
+
+        Assert.True(stats.atimeMs > 0);
+        Assert.True(stats.mtimeMs > 0);
+        Assert.True(stats.ctimeMs > 0);
+        Assert.True(stats.birthtimeMs > 0);
+    }
 }

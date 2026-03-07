@@ -172,4 +172,40 @@ public class HttpServerTests
             await client.GetAsync($"http://localhost:{port}/");
         });
     }
+
+    [Fact]
+    public async Task ServerResponse_StatusCode_AcceptsIntegralDoubleValues()
+    {
+        var port = 18085d;
+
+        var server = http.createServer((req, res) =>
+        {
+            res.statusCode = 204d;
+            res.end();
+        });
+
+        server.listen(port, (Action?)null);
+
+        try
+        {
+            using var client = new HttpClient();
+            var response = await client.GetAsync($"http://localhost:{port}/");
+
+            Assert.Equal(System.Net.HttpStatusCode.NoContent, response.StatusCode);
+        }
+        finally
+        {
+            server.close();
+            await Task.Delay(500);
+        }
+    }
+
+    [Fact]
+    public void Server_Listen_WithFractionalPort_Throws()
+    {
+        var server = http.createServer((req, res) => res.end("OK"));
+
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            server.listen(18086.5d, (Action?)null));
+    }
 }

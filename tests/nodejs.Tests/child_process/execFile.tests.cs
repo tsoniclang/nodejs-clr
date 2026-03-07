@@ -15,6 +15,7 @@ public class ChildProcessExecFileTests
     {
         var file = IsWindows ? "cmd.exe" : "/bin/echo";
         var args = IsWindows ? new[] { "/c", "echo", "Hello" } : new[] { "Hello" };
+        var resetEvent = new ManualResetEventSlim(false);
         var callbackCalled = false;
         var stdout = "";
 
@@ -22,11 +23,11 @@ public class ChildProcessExecFileTests
         {
             callbackCalled = true;
             stdout = stdoutStr;
+            resetEvent.Set();
         });
 
-        // Wait for async execution
-        Thread.Sleep(500);
-
+        var signaled = resetEvent.Wait(5000);
+        Assert.True(signaled, "execFile callback was not called within timeout");
         Assert.True(callbackCalled);
         Assert.Contains("Hello", stdout);
     }

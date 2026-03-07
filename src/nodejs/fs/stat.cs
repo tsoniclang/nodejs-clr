@@ -30,10 +30,14 @@ public static partial class fs
                 {
                     size = fileInfo.Length,
                     mode = 0,
-                    atime = fileInfo.LastAccessTime,
-                    mtime = fileInfo.LastWriteTime,
-                    ctime = fileInfo.CreationTime,
-                    birthtime = fileInfo.CreationTime,
+                    atime = StatTime.ToJsDate(fileInfo.LastAccessTime),
+                    atimeMs = StatTime.ToUnixMilliseconds(fileInfo.LastAccessTime),
+                    mtime = StatTime.ToJsDate(fileInfo.LastWriteTime),
+                    mtimeMs = StatTime.ToUnixMilliseconds(fileInfo.LastWriteTime),
+                    ctime = StatTime.ToJsDate(fileInfo.CreationTime),
+                    ctimeMs = StatTime.ToUnixMilliseconds(fileInfo.CreationTime),
+                    birthtime = StatTime.ToJsDate(fileInfo.CreationTime),
+                    birthtimeMs = StatTime.ToUnixMilliseconds(fileInfo.CreationTime),
                     isFile = true,
                     isDirectory = false
                 };
@@ -44,10 +48,14 @@ public static partial class fs
                 {
                     size = 0,
                     mode = 0,
-                    atime = dirInfo.LastAccessTime,
-                    mtime = dirInfo.LastWriteTime,
-                    ctime = dirInfo.CreationTime,
-                    birthtime = dirInfo.CreationTime,
+                    atime = StatTime.ToJsDate(dirInfo.LastAccessTime),
+                    atimeMs = StatTime.ToUnixMilliseconds(dirInfo.LastAccessTime),
+                    mtime = StatTime.ToJsDate(dirInfo.LastWriteTime),
+                    mtimeMs = StatTime.ToUnixMilliseconds(dirInfo.LastWriteTime),
+                    ctime = StatTime.ToJsDate(dirInfo.CreationTime),
+                    ctimeMs = StatTime.ToUnixMilliseconds(dirInfo.CreationTime),
+                    birthtime = StatTime.ToJsDate(dirInfo.CreationTime),
+                    birthtimeMs = StatTime.ToUnixMilliseconds(dirInfo.CreationTime),
                     isFile = false,
                     isDirectory = true
                 };

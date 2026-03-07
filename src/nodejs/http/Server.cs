@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Logging;
 using nodejs;
+using Tsonic.JSRuntime;
 
 namespace nodejs.Http;
 
@@ -20,11 +22,32 @@ public partial class Server : EventEmitter
     private IWebHost? _host;
     private readonly Action<IncomingMessage, ServerResponse>? _requestListener;
     private int _maxHeadersCount = 2000;
-    private int _timeout = 0; // 0 means no timeout (Node.js default)
-    private int _headersTimeout = 60000; // 60 seconds (Node.js default)
-    private int _requestTimeout = 300000; // 300 seconds (5 minutes, Node.js default)
-    private int _keepAliveTimeout = 5000; // 5 seconds (Node.js default)
+    private double _timeout = 0; // 0 means no timeout (Node.js default)
+    private double _headersTimeout = 60000; // 60 seconds (Node.js default)
+    private double _requestTimeout = 300000; // 300 seconds (5 minutes, Node.js default)
+    private double _keepAliveTimeout = 5000; // 5 seconds (Node.js default)
     private bool _listening = false;
+
+    private static IPAddress ResolveHostname(string hostname)
+    {
+        if (IPAddress.TryParse(hostname, out var parsed))
+        {
+            return parsed;
+        }
+
+        if (string.Equals(hostname, "localhost", StringComparison.OrdinalIgnoreCase))
+        {
+            return IPAddress.Loopback;
+        }
+
+        var addresses = Dns.GetHostAddresses(hostname);
+        if (addresses.Length == 0)
+        {
+            throw new InvalidOperationException($"Unable to resolve hostname: {hostname}");
+        }
+
+        return addresses[0];
+    }
 
     /// <summary>
     /// Creates a new HTTP server.
@@ -55,30 +78,30 @@ public partial class Server : EventEmitter
     /// Sets the timeout value in milliseconds for receiving the entire request from the client.
     /// Default: 0 (no timeout)
     /// </summary>
-    public int timeout
+    public double timeout
     {
         get => _timeout;
-        set => _timeout = value;
+        set => _timeout = JsNumeric.RequireFiniteNonNegative(value, nameof(timeout));
     }
 
     /// <summary>
     /// Limits the amount of time the parser will wait to receive the complete HTTP headers.
     /// Default: 60000 (60 seconds)
     /// </summary>
-    public int headersTimeout
+    public double headersTimeout
     {
         get => _headersTimeout;
-        set => _headersTimeout = value;
+        set => _headersTimeout = JsNumeric.RequireFiniteNonNegative(value, nameof(headersTimeout));
     }
 
     /// <summary>
     /// Sets the timeout value in milliseconds for receiving the entire request from the client.
     /// Default: 300000 (5 minutes)
     /// </summary>
-    public int requestTimeout
+    public double requestTimeout
     {
         get => _requestTimeout;
-        set => _requestTimeout = value;
+        set => _requestTimeout = JsNumeric.RequireFiniteNonNegative(value, nameof(requestTimeout));
     }
 
     /// <summary>
@@ -86,10 +109,10 @@ public partial class Server : EventEmitter
     /// before a socket will be destroyed.
     /// Default: 5000 (5 seconds)
     /// </summary>
-    public int keepAliveTimeout
+    public double keepAliveTimeout
     {
         get => _keepAliveTimeout;
-        set => _keepAliveTimeout = value;
+        set => _keepAliveTimeout = JsNumeric.RequireFiniteNonNegative(value, nameof(keepAliveTimeout));
     }
 
     /// <summary>
@@ -105,8 +128,19 @@ public partial class Server : EventEmitter
     /// <param name="backlog">Maximum length of the queue of pending connections (ignored in Kestrel).</param>
     /// <param name="callback">Optional callback when server has been started.</param>
     /// <returns>The server instance for chaining.</returns>
-    public Server listen(int port, string? hostname = null, int? backlog = null, Action? callback = null)
+    public Server listen(double port, string? hostname = null, double? backlog = null, Action? callback = null)
     {
+        if (_listening)
+        {
+            throw new InvalidOperationException("Server is already listening");
+        }
+
+        var normalizedPort = JsNumeric.ToPort(port, nameof(port));
+        if (backlog.HasValue)
+        {
+            JsNumeric.RequireFiniteNonNegative(backlog.Value, nameof(backlog));
+        }
+
         // Use minimal WebHost setup to avoid file watchers
         var host = new WebHostBuilder()
             .UseKestrel(options =>
@@ -114,7 +148,7 @@ public partial class Server : EventEmitter
                 if (string.IsNullOrEmpty(hostname))
                 {
                     // Listen on all interfaces
-                    options.ListenAnyIP(port, listenOptions =>
+                    options.ListenAnyIP(normalizedPort, listenOptions =>
                     {
                         listenOptions.Protocols = HttpProtocols.Http1;
                     });
@@ -122,7 +156,7 @@ public partial class Server : EventEmitter
                 else
                 {
                     // Listen on specific hostname
-                    options.Listen(System.Net.IPAddress.Parse(hostname), port, listenOptions =>
+                    options.Listen(ResolveHostname(hostname), normalizedPort, listenOptions =>
                     {
                         listenOptions.Protocols = HttpProtocols.Http1;
                     });
@@ -152,21 +186,23 @@ public partial class Server : EventEmitter
             .Build();
 
         _host = host;
+        ProcessKeepAlive.Acquire();
 
-        // Start server asynchronously
-        _ = _host.RunAsync();
-
-        _listening = true;
-
-        // Give it a moment to start
-        Task.Delay(100).Wait();
-
-        // Emit 'listening' event
-        emit("listening");
-
-        callback?.Invoke();
-
-        return this;
+        try
+        {
+            _host.Start();
+            _listening = true;
+            emit("listening");
+            callback?.Invoke();
+            return this;
+        }
+        catch
+        {
+            _host.Dispose();
+            _host = null;
+            ProcessKeepAlive.Release();
+            throw;
+        }
     }
 
     /// <summary>
@@ -175,9 +211,17 @@ public partial class Server : EventEmitter
     /// <param name="port">The port number.</param>
     /// <param name="callback">Optional callback when server has been started.</param>
     /// <returns>The server instance for chaining.</returns>
-    public Server listen(int port, Action? callback)
+    public Server listen(double port, Action? callback)
     {
         return listen(port, null, null, callback);
+    }
+
+    /// <summary>
+    /// Begin accepting connections on the specified port and hostname.
+    /// </summary>
+    public Server listen(double port, string hostname, Action? callback)
+    {
+        return listen(port, hostname, null, callback);
     }
 
     /// <summary>
@@ -195,10 +239,19 @@ public partial class Server : EventEmitter
     {
         if (_host != null)
         {
-            await _host.StopAsync();
-            _listening = false;
-            emit("close");
-            callback?.Invoke();
+            try
+            {
+                await _host.StopAsync();
+                _host.Dispose();
+            }
+            finally
+            {
+                _host = null;
+                _listening = false;
+                ProcessKeepAlive.Release();
+                emit("close");
+                callback?.Invoke();
+            }
         }
     }
 
@@ -208,9 +261,9 @@ public partial class Server : EventEmitter
     /// <param name="msecs">Timeout in milliseconds.</param>
     /// <param name="callback">Optional callback to be added as a listener on the 'timeout' event.</param>
     /// <returns>The server instance for chaining.</returns>
-    public Server setTimeout(int msecs, Action? callback = null)
+    public Server setTimeout(double msecs, Action? callback = null)
     {
-        _timeout = msecs;
+        _timeout = JsNumeric.RequireFiniteNonNegative(msecs, nameof(msecs));
 
         if (callback != null)
         {

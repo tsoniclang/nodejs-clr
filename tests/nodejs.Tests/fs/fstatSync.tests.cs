@@ -1,6 +1,6 @@
-using Xunit;
 using System;
 using System.IO;
+using Xunit;
 
 namespace nodejs.Tests;
 
@@ -64,10 +64,16 @@ public class Fs_fstatSyncTests : IDisposable
 
         fs.closeSync(fd);
 
-        Assert.True(stats.atime > DateTime.MinValue);
-        Assert.True(stats.mtime > DateTime.MinValue);
-        Assert.True(stats.ctime > DateTime.MinValue);
-        Assert.True(stats.birthtime > DateTime.MinValue);
+        Assert.True(stats.atime.getTime() > 0);
+        Assert.True(stats.mtime.getTime() > 0);
+        Assert.True(stats.ctime.getTime() > 0);
+        Assert.True(stats.birthtime.getTime() > 0);
+        Assert.True(stats.atimeMs > 0);
+        Assert.True(stats.mtimeMs > 0);
+        Assert.True(stats.ctimeMs > 0);
+        Assert.True(stats.birthtimeMs > 0);
+        Assert.Equal((long)stats.atimeMs, stats.atime.getTime());
+        Assert.Equal((long)stats.mtimeMs, stats.mtime.getTime());
     }
 
     [Fact]

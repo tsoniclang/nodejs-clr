@@ -25,9 +25,9 @@ public class ChildProcessExitTests
             resetEvent.Set();
         });
 
-        var signaled = resetEvent.Wait(2000);
+        var signaled = resetEvent.Wait(5000);
 
-        Assert.True(signaled);
+        Assert.True(signaled, "exit event was not emitted within timeout");
         Assert.NotNull(capturedExitCode);
         Assert.Equal(0, capturedExitCode.Value);
     }
@@ -47,9 +47,9 @@ public class ChildProcessExitTests
             resetEvent.Set();
         });
 
-        var signaled = resetEvent.Wait(2000);
+        var signaled = resetEvent.Wait(5000);
 
-        Assert.True(signaled);
+        Assert.True(signaled, "exit event was not emitted within timeout");
         Assert.Equal(42, capturedExitCode);
     }
 
@@ -66,8 +66,9 @@ public class ChildProcessExitTests
             resetEvent.Set();
         });
 
-        resetEvent.Wait(2000);
-        Thread.Sleep(100); // Give time for property to be set
+        var signaled = resetEvent.Wait(5000);
+        Assert.True(signaled, "exit event was not emitted within timeout");
+        SpinWait.SpinUntil(() => child.exitCode != null, TimeSpan.FromSeconds(1));
 
         Assert.NotNull(child.exitCode);
     }

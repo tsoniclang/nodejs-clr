@@ -32,7 +32,7 @@ public class FsPromises
     public Task<int> open(string path, string flags, int? mode = null) => fs.open(path, flags, mode);
     public Task<int> read(int fd, byte[] buffer, int offset, int length, int? position) => fs.read(fd, buffer, offset, length, position);
     public Task<string[]> readdir(string path, bool withFileTypes = false) => fs.readdir(path, withFileTypes);
-    public Task<string> readFile(string path, string? encoding = "utf-8") => fs.readFile(path, encoding);
+    public Task<string> readFile(string path, string encoding = "utf-8") => fs.readFile(path, encoding);
     public Task<byte[]> readFileBytes(string path) => fs.readFileBytes(path);
     public Task<string> readlink(string path) => fs.readlink(path);
     public Task<string> realpath(string path) => fs.realpath(path);

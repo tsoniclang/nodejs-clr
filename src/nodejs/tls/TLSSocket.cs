@@ -322,7 +322,7 @@ public class TLSSocket : Socket
     {
         // TLS 1.3 doesn't support renegotiation
         // .NET SslStream doesn't support renegotiation
-        Task.Run(() => callback(new NotSupportedException("Renegotiation not supported")));
+        callback(new NotSupportedException("Renegotiation not supported"));
         return false;
     }
 

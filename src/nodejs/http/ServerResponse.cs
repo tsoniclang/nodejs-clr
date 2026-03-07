@@ -25,14 +25,14 @@ public partial class ServerResponse : EventEmitter
     /// <summary>
     /// Gets or sets the HTTP status code that will be sent to the client.
     /// </summary>
-    public int statusCode
+    public double statusCode
     {
         get => _response.StatusCode;
         set
         {
             if (_headersSent)
                 throw new InvalidOperationException("Cannot set status code after headers have been sent");
-            _response.StatusCode = value;
+            _response.StatusCode = JsNumeric.ToExactInt32(value, nameof(statusCode));
         }
     }
 
@@ -61,12 +61,12 @@ public partial class ServerResponse : EventEmitter
     /// <param name="statusMessage">Optional status message (ignored in HTTP/2).</param>
     /// <param name="headers">Optional headers object.</param>
     /// <returns>The ServerResponse instance for chaining.</returns>
-    public ServerResponse writeHead(int statusCode, string? statusMessage = null, Dictionary<string, string>? headers = null)
+    public ServerResponse writeHead(double statusCode, string? statusMessage = null, Dictionary<string, string>? headers = null)
     {
         if (_headersSent)
             throw new InvalidOperationException("Headers already sent");
 
-        _response.StatusCode = statusCode;
+        _response.StatusCode = JsNumeric.ToExactInt32(statusCode, nameof(statusCode));
 
         if (statusMessage != null)
             this.statusMessage = statusMessage;
@@ -89,7 +89,7 @@ public partial class ServerResponse : EventEmitter
     /// <param name="statusCode">The HTTP status code.</param>
     /// <param name="headers">Headers object.</param>
     /// <returns>The ServerResponse instance for chaining.</returns>
-    public ServerResponse writeHead(int statusCode, Dictionary<string, string> headers)
+    public ServerResponse writeHead(double statusCode, Dictionary<string, string> headers)
     {
         return writeHead(statusCode, null, headers);
     }
@@ -193,26 +193,95 @@ public partial class ServerResponse : EventEmitter
     }
 
     /// <summary>
+    /// Sends a chunk of the response body from a Buffer.
+    /// </summary>
+    public bool write(Buffer chunk, Action? callback = null)
+    {
+        if (!_headersSent)
+        {
+            _headersSent = true;
+        }
+
+        Task.Run(async () => await _response.Body.WriteAsync(chunk.InternalData)).GetAwaiter().GetResult();
+        callback?.Invoke();
+        return true;
+    }
+
+    /// <summary>
+    /// Sends a chunk of the response body from a byte array.
+    /// </summary>
+    public bool write(byte[] chunk, Action? callback = null)
+    {
+        if (!_headersSent)
+        {
+            _headersSent = true;
+        }
+
+        Task.Run(async () => await _response.Body.WriteAsync(chunk)).GetAwaiter().GetResult();
+        callback?.Invoke();
+        return true;
+    }
+
+    /// <summary>
     /// Signals that all response headers and body have been sent.
     /// Node.js idiomatic: synchronous from caller's perspective, returns this for chaining.
     /// </summary>
-    /// <param name="chunk">Optional final chunk to send.</param>
+    /// <returns>This response for chaining.</returns>
+    public ServerResponse end()
+    {
+        _finished = true;
+        emit("finish");
+        return this;
+    }
+
+    /// <summary>
+    /// Signals response completion with an optional callback and no payload.
+    /// </summary>
+    public ServerResponse end(Action? callback)
+    {
+        var response = end();
+        callback?.Invoke();
+        return response;
+    }
+
+    /// <summary>
+    /// Signals that all response headers and body have been sent.
+    /// Node.js idiomatic: synchronous from caller's perspective, returns this for chaining.
+    /// </summary>
+    /// <param name="chunk">Final chunk to send.</param>
     /// <param name="encoding">Optional encoding (ignored, always UTF-8).</param>
     /// <param name="callback">Optional callback when response is finished.</param>
     /// <returns>This response for chaining.</returns>
-    public ServerResponse end(string? chunk = null, string? encoding = null, Action? callback = null)
+    public ServerResponse end(string chunk, string? encoding = null, Action? callback = null)
     {
         // Write synchronously - use Task.Run to avoid sync-over-async deadlock
         // Server will call CompleteAsync after emit returns
-        if (chunk != null)
-        {
-            Task.Run(async () => await _response.WriteAsync(chunk)).GetAwaiter().GetResult();
-        }
-
-        _finished = true;
-        emit("finish");
+        Task.Run(async () => await _response.WriteAsync(chunk)).GetAwaiter().GetResult();
+        var response = end();
         callback?.Invoke();
-        return this;
+        return response;
+    }
+
+    /// <summary>
+    /// Signals response completion with an optional Buffer payload.
+    /// </summary>
+    public ServerResponse end(Buffer chunk, Action? callback = null)
+    {
+        Task.Run(async () => await _response.Body.WriteAsync(chunk.InternalData)).GetAwaiter().GetResult();
+        var response = end();
+        callback?.Invoke();
+        return response;
+    }
+
+    /// <summary>
+    /// Signals response completion with an optional byte-array payload.
+    /// </summary>
+    public ServerResponse end(byte[] chunk, Action? callback = null)
+    {
+        Task.Run(async () => await _response.Body.WriteAsync(chunk)).GetAwaiter().GetResult();
+        var response = end();
+        callback?.Invoke();
+        return response;
     }
 
     /// <summary>
@@ -221,8 +290,10 @@ public partial class ServerResponse : EventEmitter
     /// <param name="msecs">Timeout in milliseconds.</param>
     /// <param name="callback">Optional callback for timeout event.</param>
     /// <returns>The ServerResponse instance.</returns>
-    public ServerResponse setTimeout(int msecs, Action? callback = null)
+    public ServerResponse setTimeout(double msecs, Action? callback = null)
     {
+        JsNumeric.RequireFiniteNonNegative(msecs, nameof(msecs));
+
         if (callback != null)
         {
             once("timeout", callback);

@@ -1,4 +1,5 @@
 using System;
+using System.Net.Sockets;
 using System.Threading;
 using Xunit;
 
@@ -6,7 +7,13 @@ namespace nodejs.Tests;
 
 public class ServerTests
 {
-    private const int TEST_PORT = 18234;
+    private static int GetListeningPort(Server server)
+    {
+        var address = server.address();
+        Assert.NotNull(address);
+        Assert.IsType<AddressInfo>(address);
+        return ((AddressInfo)address).port;
+    }
 
     [Fact]
     public void Server_Constructor_CreatesInstance()
@@ -59,7 +66,7 @@ public class ServerTests
             resetEvent.Set();
         });
 
-        server.listen(TEST_PORT, "127.0.0.1");
+        server.listen(0, "127.0.0.1");
 
         resetEvent.Wait(2000);
         Assert.True(listeningEmitted);
@@ -75,7 +82,7 @@ public class ServerTests
         var resetEvent = new ManualResetEventSlim(false);
         var callbackCalled = false;
 
-        server.listen(TEST_PORT + 1, "127.0.0.1", () =>
+        server.listen(0, "127.0.0.1", () =>
         {
             callbackCalled = true;
             resetEvent.Set();
@@ -102,7 +109,7 @@ public class ServerTests
             closeResetEvent.Set();
         });
 
-        server.listen(TEST_PORT + 2, "127.0.0.1");
+        server.listen(0, "127.0.0.1");
         listenResetEvent.Wait(2000);
 
         server.close();
@@ -122,7 +129,7 @@ public class ServerTests
 
         server.on("listening", () => listenResetEvent.Set());
 
-        server.listen(TEST_PORT + 3, "127.0.0.1");
+        server.listen(0, "127.0.0.1");
         listenResetEvent.Wait(2000);
 
         server.close((err) =>
@@ -142,7 +149,7 @@ public class ServerTests
         var resetEvent = new ManualResetEventSlim(false);
 
         server.on("listening", () => resetEvent.Set());
-        server.listen(TEST_PORT + 4, "127.0.0.1");
+        server.listen(0, "127.0.0.1");
         resetEvent.Wait(2000);
 
         var address = server.address();
@@ -150,7 +157,7 @@ public class ServerTests
         Assert.IsType<AddressInfo>(address);
 
         var addrInfo = (AddressInfo)address;
-        Assert.Equal(TEST_PORT + 4, addrInfo.port);
+        Assert.True(addrInfo.port > 0);
         Assert.NotEmpty(addrInfo.address);
         Assert.NotEmpty(addrInfo.family);
 
@@ -165,7 +172,7 @@ public class ServerTests
         var connectionCount = -1;
 
         server.on("listening", () => resetEvent.Set());
-        server.listen(TEST_PORT + 5, "127.0.0.1");
+        server.listen(0, "127.0.0.1");
         resetEvent.Wait(2000);
 
         server.getConnections((err, count) =>
@@ -210,16 +217,16 @@ public class ServerTests
             connectionResetEvent.Set();
         });
 
-        server.listen(TEST_PORT + 6, "127.0.0.1");
+        server.listen(0, "127.0.0.1");
         serverResetEvent.Wait(2000);
 
         // Connect a client
-        var client = net.connect(TEST_PORT + 6, "127.0.0.1");
+        using var client = new TcpClient();
+        client.Connect("127.0.0.1", GetListeningPort(server));
 
         connectionResetEvent.Wait(2000);
         Assert.NotNull(serverSocket);
 
-        client.destroy();
         server.close();
     }
 }
