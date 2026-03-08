@@ -1,0 +1,1260 @@
+{
+  "schemaVersion": 1,
+  "prependReferences": [
+    {
+      "kind": "path",
+      "target": "./node-aliases.d.ts"
+    }
+  ],
+  "declarationFiles": [
+    {
+      "path": "node-aliases.d.ts",
+      "imports": [],
+      "global": {
+        "interfaces": [],
+        "typeAliases": [],
+        "consts": [],
+        "classes": []
+      },
+      "modules": [
+        {
+          "name": "node:assert",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "assert"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "assert",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "assert"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:buffer",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "buffer"
+              ],
+              "name": null,
+              "type": null
+            },
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "Buffer"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "buffer",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "buffer"
+              ],
+              "name": null,
+              "type": null
+            },
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "Buffer"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:child_process",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "child_process"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "child_process",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "child_process"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:fs",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "fs"
+              ],
+              "name": null,
+              "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "existsSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.existsSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "readFileSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.readFileSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "readFile",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.readFile"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "readFileSyncBytes",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.readFileSyncBytes"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "readdirSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.readdirSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "readdir",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.readdir"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "copyFileSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.copyFileSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "mkdirSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.mkdirSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "realpathSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.realpathSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "rmSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.rmSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "statSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.statSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "writeFileSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.writeFileSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "writeFileSyncBytes",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.writeFileSyncBytes"
+            }
+          ]
+        },
+        {
+          "name": "fs",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "fs"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:path",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "path"
+              ],
+              "name": null,
+              "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "join",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.join"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "extname",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.extname"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "basename",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.basename"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "dirname",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.dirname"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "parse",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.parse"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "isAbsolute",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.isAbsolute"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "normalize",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.normalize"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "relative",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.relative"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "resolve",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.resolve"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "sep",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.sep"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "delimiter",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.delimiter"
+            }
+          ]
+        },
+        {
+          "name": "path",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "path"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:crypto",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "crypto"
+              ],
+              "name": null,
+              "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "randomUUID",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").crypto.randomUUID"
+            }
+          ]
+        },
+        {
+          "name": "crypto",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "crypto"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:dgram",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "dgram"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "dgram",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "dgram"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:dns",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "dns"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "dns",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "dns"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:events",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "events"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "events",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "events"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:net",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "net"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "net",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "net"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:os",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "os"
+              ],
+              "name": null,
+              "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "homedir",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").os.homedir"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "tmpdir",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").os.tmpdir"
+            }
+          ]
+        },
+        {
+          "name": "os",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "os"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:process",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "process"
+              ],
+              "name": null,
+              "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "argv",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.argv"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "argv0",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.argv0"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "arch",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.arch"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "cwd",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.cwd"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "chdir",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.chdir"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "env",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.env"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "execPath",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.execPath"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "exit",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.exit"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "exitCode",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.exitCode"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "kill",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.kill"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "pid",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.pid"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "ppid",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.ppid"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "platform",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.platform"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "version",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.version"
+            }
+          ]
+        },
+        {
+          "name": "process",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "process"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:querystring",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "querystring"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "querystring",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "querystring"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:readline",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "readline"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "readline",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "readline"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:stream",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "stream"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "stream",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "stream"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:timers",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "timers"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "timers",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "timers"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:tls",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "tls"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "tls",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "tls"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:url",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "url"
+              ],
+              "name": null,
+              "type": null
+            },
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "URL",
+                "URLSearchParams"
+              ],
+              "name": null,
+              "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "fileURLToPath",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").url.fileURLToPath"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "pathToFileURL",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").url.pathToFileURL"
+            }
+          ]
+        },
+        {
+          "name": "url",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "url"
+              ],
+              "name": null,
+              "type": null
+            },
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "URL",
+                "URLSearchParams"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:http",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/nodejs.Http.js",
+              "names": [
+                "http"
+              ],
+              "name": null,
+              "type": null
+            },
+            {
+              "kind": "reexportType",
+              "from": "@tsonic/nodejs/nodejs.Http.js",
+              "names": [
+                "AddressInfo",
+                "ClientRequest",
+                "IncomingMessage",
+                "RequestOptions",
+                "Server",
+                "ServerResponse"
+              ],
+              "name": null,
+              "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "createServer",
+              "type": "typeof import(\"@tsonic/nodejs/nodejs.Http.js\").http.createServer"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "get",
+              "type": "typeof import(\"@tsonic/nodejs/nodejs.Http.js\").http.get"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "request",
+              "type": "typeof import(\"@tsonic/nodejs/nodejs.Http.js\").http.request"
+            }
+          ]
+        },
+        {
+          "name": "http",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/nodejs.Http.js",
+              "names": [
+                "http"
+              ],
+              "name": null,
+              "type": null
+            },
+            {
+              "kind": "reexportType",
+              "from": "@tsonic/nodejs/nodejs.Http.js",
+              "names": [
+                "AddressInfo",
+                "ClientRequest",
+                "IncomingMessage",
+                "RequestOptions",
+                "Server",
+                "ServerResponse"
+              ],
+              "name": null,
+              "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "createServer",
+              "type": "typeof import(\"@tsonic/nodejs/nodejs.Http.js\").http.createServer"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "get",
+              "type": "typeof import(\"@tsonic/nodejs/nodejs.Http.js\").http.get"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "request",
+              "type": "typeof import(\"@tsonic/nodejs/nodejs.Http.js\").http.request"
+            }
+          ]
+        },
+        {
+          "name": "node:util",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "util"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "util",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "util"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "node:zlib",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "zlib"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        },
+        {
+          "name": "zlib",
+          "statements": [
+            {
+              "kind": "reexport",
+              "from": "@tsonic/nodejs/index.js",
+              "names": [
+                "zlib"
+              ],
+              "name": null,
+              "type": null
+            }
+          ]
+        }
+      ],
+      "statements": [],
+      "exportEmpty": false
+    }
+  ],
+  "simpleBindings": {
+    "node:assert": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.assert"
+    },
+    "assert": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.assert"
+    },
+    "node:buffer": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.buffer"
+    },
+    "buffer": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.buffer"
+    },
+    "node:child_process": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.child_process"
+    },
+    "child_process": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.child_process"
+    },
+    "node:crypto": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.crypto"
+    },
+    "crypto": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.crypto"
+    },
+    "node:dgram": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.dgram"
+    },
+    "dgram": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.dgram"
+    },
+    "node:dns": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.dns"
+    },
+    "dns": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.dns"
+    },
+    "node:events": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.events"
+    },
+    "events": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.events"
+    },
+    "node:http": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.Http.http"
+    },
+    "http": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.Http.http"
+    },
+    "node:fs": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.fs"
+    },
+    "fs": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.fs"
+    },
+    "node:net": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.net"
+    },
+    "net": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.net"
+    },
+    "node:os": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.os"
+    },
+    "os": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.os"
+    },
+    "node:path": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.path"
+    },
+    "path": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.path"
+    },
+    "node:process": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.process"
+    },
+    "process": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.process"
+    },
+    "node:querystring": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.querystring"
+    },
+    "querystring": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.querystring"
+    },
+    "node:readline": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.readline"
+    },
+    "readline": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.readline"
+    },
+    "node:stream": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.stream"
+    },
+    "stream": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.stream"
+    },
+    "node:timers": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.timers"
+    },
+    "timers": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.timers"
+    },
+    "node:tls": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.tls"
+    },
+    "tls": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.tls"
+    },
+    "node:url": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.url"
+    },
+    "url": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.url"
+    },
+    "node:util": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.util"
+    },
+    "util": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.util"
+    },
+    "node:zlib": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.zlib"
+    },
+    "zlib": {
+      "kind": "module",
+      "assembly": "nodejs",
+      "type": "nodejs.zlib"
+    }
+  },
+  "bindingsManifest": {
+    "bindingVersion": 1,
+    "packageName": "@tsonic/nodejs",
+    "assemblyName": "nodejs",
+    "requiredTypeRoots": [
+      "."
+    ],
+    "runtimePackages": [
+      "@tsonic/nodejs"
+    ],
+    "dotnet": {
+      "frameworkReferences": [
+        {
+          "id": "Microsoft.AspNetCore.App",
+          "types": "@tsonic/aspnetcore"
+        }
+      ],
+      "packageReferences": [
+        {
+          "id": "Tsonic.Nodejs",
+          "version": "1.0.1",
+          "types": "@tsonic/nodejs"
+        }
+      ]
+    }
+  }
+}

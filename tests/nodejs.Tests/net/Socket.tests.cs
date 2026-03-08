@@ -8,6 +8,14 @@ public class SocketTests
 {
     private const int TEST_PORT = 18234;
 
+    private static int GetListeningPort(Server server)
+    {
+        var address = server.address();
+        Assert.NotNull(address);
+        Assert.IsType<AddressInfo>(address);
+        return ((AddressInfo)address).port;
+    }
+
     [Fact]
     public void Socket_Constructor_CreatesInstance()
     {
@@ -246,11 +254,11 @@ public class SocketTests
             });
         });
 
-        server.listen(TEST_PORT + 1, () =>
+        server.listen(0, () =>
         {
             // Connect a client and send data
             var client = new Socket();
-            client.connect(TEST_PORT + 1, "localhost", () =>
+            client.connect(GetListeningPort(server), "localhost", () =>
             {
                 client.write(testMessage);
             });
@@ -268,7 +276,8 @@ public class SocketTests
     [Fact]
     public void Socket_DataEvent_EmitsMultipleChunks()
     {
-        var dataChunks = new System.Collections.Generic.List<string>();
+        const string expected = "Chunk1Chunk2Chunk3";
+        var combined = "";
         var resetEvent = new ManualResetEventSlim(false);
 
         // Create a server
@@ -276,19 +285,19 @@ public class SocketTests
         {
             clientSocket.on("data", (Buffer data) =>
             {
-                dataChunks.Add(data.toString());
-                if (dataChunks.Count >= 3)
+                combined += data.toString();
+                if (combined.Length >= expected.Length)
                 {
                     resetEvent.Set();
                 }
             });
         });
 
-        server.listen(TEST_PORT + 2, () =>
+        server.listen(0, () =>
         {
             // Connect a client and send multiple chunks
             var client = new Socket();
-            client.connect(TEST_PORT + 2, "localhost", () =>
+            client.connect(GetListeningPort(server), "localhost", () =>
             {
                 client.write("Chunk1");
                 Thread.Sleep(50);
@@ -302,8 +311,8 @@ public class SocketTests
         var signaled = resetEvent.Wait(5000);
         server.close();
 
-        Assert.True(signaled, "Should have received 3 data chunks within timeout");
-        Assert.True(dataChunks.Count >= 3, "Should have received at least 3 data events");
+        Assert.True(signaled, "Should have received all chunk data within timeout");
+        Assert.Equal(expected, combined);
     }
 
     [Fact]
@@ -322,11 +331,11 @@ public class SocketTests
             });
         });
 
-        server.listen(TEST_PORT + 3, () =>
+        server.listen(0, () =>
         {
             // Connect a client, then close it
             var client = new Socket();
-            client.connect(TEST_PORT + 3, "localhost", () =>
+            client.connect(GetListeningPort(server), "localhost", () =>
             {
                 Thread.Sleep(100);
                 client.end();
@@ -359,7 +368,7 @@ public class SocketTests
             });
         });
 
-        server.listen(TEST_PORT + 4, () =>
+        server.listen(0, () =>
         {
             var client = new Socket();
             client.on("data", (Buffer data) =>
@@ -368,7 +377,7 @@ public class SocketTests
                 resetEvent.Set();
             });
 
-            client.connect(TEST_PORT + 4, "localhost", () =>
+            client.connect(GetListeningPort(server), "localhost", () =>
             {
                 client.write("Test message");
             });

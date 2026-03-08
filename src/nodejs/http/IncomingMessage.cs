@@ -85,7 +85,7 @@ public partial class IncomingMessage : EventEmitter
     /// <summary>
     /// Response status code (client-side) or null (server-side).
     /// </summary>
-    public int? statusCode => _isServerSide ? null : (int?)_clientResponse?.StatusCode;
+    public double? statusCode => _isServerSide ? null : (double?)_clientResponse?.StatusCode;
 
     /// <summary>
     /// Response status message (client-side) or null (server-side).
@@ -117,8 +117,10 @@ public partial class IncomingMessage : EventEmitter
     /// <param name="msecs">Timeout in milliseconds.</param>
     /// <param name="callback">Optional callback for timeout event.</param>
     /// <returns>The IncomingMessage instance.</returns>
-    public IncomingMessage setTimeout(int msecs, Action? callback = null)
+    public IncomingMessage setTimeout(double msecs, Action? callback = null)
     {
+        JsNumeric.RequireFiniteNonNegative(msecs, nameof(msecs));
+
         if (callback != null)
         {
             once("timeout", callback);

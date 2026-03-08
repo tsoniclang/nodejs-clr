@@ -1,6 +1,5 @@
-using System;
 using System.Threading;
-using System.Threading.Tasks;
+using Tsonic.JSRuntime;
 
 namespace nodejs;
 
@@ -24,7 +23,7 @@ public static class timers
     /// <returns>A Timeout object that can be used with clearTimeout().</returns>
     public static Timeout setTimeout(Action callback, int delay = 0)
     {
-        return new Timeout(callback, Math.Max(0, delay));
+        return new Timeout(callback, System.Math.Max(0, delay));
     }
 
     /// <summary>
@@ -44,19 +43,8 @@ public static class timers
     /// <returns>A Timeout object that can be used with clearInterval().</returns>
     public static Timeout setInterval(Action callback, int delay = 0)
     {
-        var actualDelay = Math.Max(0, delay);
-        var interval = new IntervalTimeout(callback);
-
-        var timer = new Timer(_ =>
-        {
-            if (!interval.IsDisposed)
-            {
-                callback();
-            }
-        }, null, actualDelay, actualDelay);
-
-        interval.SetTimer(timer);
-        return interval;
+        var actualDelay = System.Math.Max(0, delay);
+        return new Timeout(callback, actualDelay, actualDelay);
     }
 
     /// <summary>
@@ -93,40 +81,22 @@ public static class timers
     /// <param name="callback">The function to call.</param>
     public static void queueMicrotask(Action callback)
     {
-        Task.Run(callback);
-    }
-
-    // Internal class for setInterval to maintain Timeout compatibility
-    private class IntervalTimeout : Timeout
-    {
-        private Timer? _intervalTimer;
-        private bool _intervalDisposed = false;
-
-        internal IntervalTimeout(Action callback) : base(callback, 0)
+        ProcessKeepAlive.Acquire();
+        var thread = new Thread(() =>
         {
-            // Dispose the base timer immediately since we're using our own
-            base.Dispose();
-        }
-
-        internal void SetTimer(Timer timer)
-        {
-            _intervalTimer = timer;
-        }
-
-        public bool IsDisposed => _intervalDisposed;
-
-        public new void Dispose()
-        {
-            if (!_intervalDisposed)
+            try
             {
-                _intervalDisposed = true;
-                // First disable the timer by setting period to Infinite
-                _intervalTimer?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
-                // Then dispose it
-                var timer = _intervalTimer;
-                _intervalTimer = null;
-                timer?.Dispose();
+                callback();
             }
-        }
+            finally
+            {
+                ProcessKeepAlive.Release();
+            }
+        })
+        {
+            IsBackground = true,
+            Name = "nodejs.Microtask",
+        };
+        thread.Start();
     }
 }

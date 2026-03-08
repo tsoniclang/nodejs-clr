@@ -97,6 +97,16 @@ public class ExecOptions
 /// </summary>
 public static class child_process
 {
+    private static void RunBackground(string name, Action action)
+    {
+        var thread = new System.Threading.Thread(() => action())
+        {
+            IsBackground = true,
+            Name = name,
+        };
+        thread.Start();
+    }
+
     // ==================== execSync ====================
 
     /// <summary>
@@ -378,7 +388,7 @@ public static class child_process
     /// <param name="callback">Callback function (error, stdout, stderr)</param>
     public static void exec(string command, ExecOptions? options, Action<Exception?, string, string> callback)
     {
-        Task.Run(() =>
+        RunBackground("nodejs.exec", () =>
         {
             try
             {
@@ -488,7 +498,7 @@ public static class child_process
     /// </summary>
     public static void execFile(string file, string[]? args, ExecOptions? options, Action<Exception?, string, string> callback)
     {
-        Task.Run(() =>
+        RunBackground("nodejs.execFile", () =>
         {
             try
             {

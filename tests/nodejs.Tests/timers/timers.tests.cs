@@ -8,10 +8,16 @@ public class TimersTests
     [Fact]
     public void setTimeout_ShouldExecuteCallback()
     {
+        var resetEvent = new ManualResetEventSlim(false);
         var executed = false;
-        var timeout = timers.setTimeout(() => executed = true, 50);
+        var timeout = timers.setTimeout(() =>
+        {
+            executed = true;
+            resetEvent.Set();
+        }, 50);
 
-        Thread.Sleep(100);
+        var signaled = resetEvent.Wait(1000);
+        Assert.True(signaled, "setTimeout callback was not called within timeout");
         Assert.True(executed);
     }
 
@@ -26,22 +32,34 @@ public class TimersTests
     [Fact]
     public void setTimeout_WithZeroDelay_ShouldExecute()
     {
+        var resetEvent = new ManualResetEventSlim(false);
         var executed = false;
-        timers.setTimeout(() => executed = true, 0);
+        timers.setTimeout(() =>
+        {
+            executed = true;
+            resetEvent.Set();
+        }, 0);
 
-        Thread.Sleep(50);
+        var signaled = resetEvent.Wait(1000);
+        Assert.True(signaled, "setTimeout(0) callback was not called within timeout");
         Assert.True(executed);
     }
 
     [Fact]
     public void clearTimeout_ShouldCancelTimeout()
     {
+        var resetEvent = new ManualResetEventSlim(false);
         var executed = false;
-        var timeout = timers.setTimeout(() => executed = true, 50);
+        var timeout = timers.setTimeout(() =>
+        {
+            executed = true;
+            resetEvent.Set();
+        }, 50);
 
         timers.clearTimeout(timeout);
-        Thread.Sleep(100);
+        var signaled = resetEvent.Wait(200);
 
+        Assert.False(signaled, "clearTimeout should prevent callback execution");
         Assert.False(executed);
     }
 
@@ -56,12 +74,19 @@ public class TimersTests
     public void setInterval_ShouldExecuteRepeatedlyAsync()
     {
         var count = 0;
-        var timeout = timers.setInterval(() => Interlocked.Increment(ref count), 50);
+        var resetEvent = new ManualResetEventSlim(false);
+        var timeout = timers.setInterval(() =>
+        {
+            if (Interlocked.Increment(ref count) >= 3)
+            {
+                resetEvent.Set();
+            }
+        }, 50);
 
-        Thread.Sleep(250);
+        var signaled = resetEvent.Wait(2000);
         timers.clearInterval(timeout);
-        Thread.Sleep(50); // Allow pending callbacks to complete
 
+        Assert.True(signaled, $"Expected at least 3 executions, got {count}");
         Assert.True(count >= 3, $"Expected at least 3 executions, got {count}");
     }
 
@@ -69,11 +94,17 @@ public class TimersTests
     public void clearInterval_ShouldNotThrow()
     {
         var count = 0;
-        var timeout = timers.setInterval(() => Interlocked.Increment(ref count), 50);
+        var resetEvent = new ManualResetEventSlim(false);
+        var timeout = timers.setInterval(() =>
+        {
+            Interlocked.Increment(ref count);
+            resetEvent.Set();
+        }, 50);
 
-        Thread.Sleep(60);
+        var signaled = resetEvent.Wait(5000);
         timers.clearInterval(timeout);
 
+        Assert.True(signaled, "Interval should have executed at least once");
         // Just verify that clearInterval doesn't throw
         Assert.True(count > 0, "Interval should have executed at least once");
     }
@@ -124,10 +155,16 @@ public class TimersTests
     [Fact]
     public void queueMicrotask_ShouldExecuteCallback()
     {
+        var resetEvent = new ManualResetEventSlim(false);
         var executed = false;
-        timers.queueMicrotask(() => executed = true);
+        timers.queueMicrotask(() =>
+        {
+            executed = true;
+            resetEvent.Set();
+        });
 
-        Thread.Sleep(100);
+        var signaled = resetEvent.Wait(1000);
+        Assert.True(signaled, "queueMicrotask callback was not called within timeout");
         Assert.True(executed);
     }
 

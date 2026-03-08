@@ -12,16 +12,28 @@ public class Stats
     public int mode { get; set; }
 
     /// <summary>The last access time.</summary>
-    public DateTime atime { get; set; }
+    public Tsonic.JSRuntime.Date atime { get; set; } = new(0);
+
+    /// <summary>The last access time in Unix epoch milliseconds.</summary>
+    public double atimeMs { get; set; }
 
     /// <summary>The last modified time.</summary>
-    public DateTime mtime { get; set; }
+    public Tsonic.JSRuntime.Date mtime { get; set; } = new(0);
+
+    /// <summary>The last modified time in Unix epoch milliseconds.</summary>
+    public double mtimeMs { get; set; }
 
     /// <summary>The last status change time.</summary>
-    public DateTime ctime { get; set; }
+    public Tsonic.JSRuntime.Date ctime { get; set; } = new(0);
+
+    /// <summary>The last status change time in Unix epoch milliseconds.</summary>
+    public double ctimeMs { get; set; }
 
     /// <summary>The creation time (birthtime).</summary>
-    public DateTime birthtime { get; set; }
+    public Tsonic.JSRuntime.Date birthtime { get; set; } = new(0);
+
+    /// <summary>The creation time in Unix epoch milliseconds.</summary>
+    public double birthtimeMs { get; set; }
 
     /// <summary>True if this is a file.</summary>
     public bool isFile { get; set; }

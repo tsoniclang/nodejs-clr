@@ -21,4 +21,21 @@ public class readFileSyncTests : FsTestBase
         var filePath = GetTestPath("nonexistent.txt");
         Assert.Throws<FileNotFoundException>(() => fs.readFileSync(filePath, "utf-8"));
     }
+
+    [Fact]
+    public void readFileSync_WithoutEncoding_ShouldReturnBuffer()
+    {
+        var filePath = GetTestPath("buffer.bin");
+        var content = new byte[] { 0x01, 0x02, 0x41, 0x42, 0x43 };
+        File.WriteAllBytes(filePath, content);
+
+        var result = fs.readFileSync(filePath);
+
+        Assert.NotNull(result);
+        Assert.Equal(content.Length, result.length);
+        for (var i = 0; i < content.Length; i++)
+        {
+            Assert.Equal(content[i], result[i]);
+        }
+    }
 }

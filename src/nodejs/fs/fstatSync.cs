@@ -26,10 +26,14 @@ public static partial class fs
         {
             size = fileInfo.Length,
             mode = Convert.ToInt32("666", 8), // 0o666 in octal = 438 decimal
-            atime = fileInfo.LastAccessTime,
-            mtime = fileInfo.LastWriteTime,
-            ctime = fileInfo.LastWriteTime,
-            birthtime = fileInfo.CreationTime,
+            atime = StatTime.ToJsDate(fileInfo.LastAccessTime),
+            atimeMs = StatTime.ToUnixMilliseconds(fileInfo.LastAccessTime),
+            mtime = StatTime.ToJsDate(fileInfo.LastWriteTime),
+            mtimeMs = StatTime.ToUnixMilliseconds(fileInfo.LastWriteTime),
+            ctime = StatTime.ToJsDate(fileInfo.LastWriteTime),
+            ctimeMs = StatTime.ToUnixMilliseconds(fileInfo.LastWriteTime),
+            birthtime = StatTime.ToJsDate(fileInfo.CreationTime),
+            birthtimeMs = StatTime.ToUnixMilliseconds(fileInfo.CreationTime),
             isFile = !fileInfo.Attributes.HasFlag(FileAttributes.Directory),
             isDirectory = fileInfo.Attributes.HasFlag(FileAttributes.Directory)
         };
