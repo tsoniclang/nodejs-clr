@@ -235,6 +235,97 @@
               ],
               "name": null,
               "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "existsSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.existsSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "readFileSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.readFileSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "readFile",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.readFile"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "readFileSyncBytes",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.readFileSyncBytes"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "readdirSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.readdirSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "readdir",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.readdir"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "copyFileSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.copyFileSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "mkdirSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.mkdirSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "realpathSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.realpathSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "rmSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.rmSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "statSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.statSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "writeFileSync",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.writeFileSync"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "writeFileSyncBytes",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").fs.writeFileSyncBytes"
             }
           ]
         },
@@ -340,6 +431,83 @@
               ],
               "name": null,
               "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "join",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.join"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "extname",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.extname"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "basename",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.basename"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "dirname",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.dirname"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "parse",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.parse"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "isAbsolute",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.isAbsolute"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "normalize",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.normalize"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "relative",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.relative"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "resolve",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.resolve"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "sep",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.sep"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "delimiter",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").path.delimiter"
             }
           ]
         },
@@ -354,6 +522,13 @@
               ],
               "name": null,
               "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "createHash",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").crypto.createHash"
             },
             {
               "kind": "const",
@@ -375,6 +550,20 @@
               ],
               "name": null,
               "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "createHash",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").crypto.createHash"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "randomUUID",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").crypto.randomUUID"
             }
           ]
         },
@@ -529,6 +718,20 @@
               ],
               "name": null,
               "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "homedir",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").os.homedir"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "tmpdir",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").os.tmpdir"
             }
           ]
         },
@@ -655,6 +858,104 @@
               ],
               "name": null,
               "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "argv",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.argv"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "argv0",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.argv0"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "arch",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.arch"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "cwd",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.cwd"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "chdir",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.chdir"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "env",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.env"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "execPath",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.execPath"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "exit",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.exit"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "exitCode",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.exitCode"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "kill",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.kill"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "pid",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.pid"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "ppid",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.ppid"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "platform",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.platform"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "version",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").process.version"
             }
           ]
         },
@@ -753,6 +1054,48 @@
               ],
               "name": null,
               "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "clearImmediate",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").timers.clearImmediate"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "clearInterval",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").timers.clearInterval"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "clearTimeout",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").timers.clearTimeout"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "setImmediate",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").timers.setImmediate"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "setInterval",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").timers.setInterval"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "setTimeout",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").timers.setTimeout"
             }
           ]
         },
@@ -767,6 +1110,48 @@
               ],
               "name": null,
               "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "clearImmediate",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").timers.clearImmediate"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "clearInterval",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").timers.clearInterval"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "clearTimeout",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").timers.clearTimeout"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "setImmediate",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").timers.setImmediate"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "setInterval",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").timers.setInterval"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "setTimeout",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").timers.setTimeout"
             }
           ]
         },
@@ -857,6 +1242,20 @@
               ],
               "name": null,
               "type": null
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "fileURLToPath",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").url.fileURLToPath"
+            },
+            {
+              "kind": "const",
+              "from": null,
+              "names": [],
+              "name": "pathToFileURL",
+              "type": "typeof import(\"@tsonic/nodejs/index.js\").url.pathToFileURL"
             }
           ]
         },
