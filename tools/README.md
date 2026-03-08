@@ -1,157 +1,48 @@
-# nodejs API Verification Tools
+# Node.js API Verification Tools
 
-This directory contains tools for verifying that nodejs's API signatures match Node.js official type definitions.
+This directory now has one verification path only.
 
-## Overview
+## Command
 
-The verification system consists of two parts:
-
-1. **API Extractor** (C#): Uses reflection to extract nodejs's API signatures
-2. **API Verifier** (TypeScript): Parses Node.js @types definitions and compares against extracted API
-
-## Workflow
-
-```
-┌─────────────────────┐
-│  nodejs DLL    │
-│  (C# Assembly)      │
-└──────────┬──────────┘
-           │
-           │ Reflection
-           ▼
-┌─────────────────────┐
-│ ApiExtractor (C#)   │
-│                     │
-└──────────┬──────────┘
-           │
-           │ Generates
-           ▼
-┌─────────────────────┐
-│ nodejs-clr-api.json│  ◄────┐
-└──────────┬──────────┘        │
-           │                   │
-           │                   │ Compares
-           ▼                   │
-┌─────────────────────┐        │
-│ API Verifier (TS)   │────────┘
-│                     │
-└──────────┬──────────┘
-           │ Parses
-           ▼
-┌─────────────────────┐
-│  @types/node/*.d.ts │
-│  (Official Types)   │
-└──────────┬──────────┘
-           │
-           │ Generates
-           ▼
-┌─────────────────────┐
-│ verification-       │
-│ report.md           │
-└─────────────────────┘
-```
-
-## Usage
-
-### Step 1: Extract nodejs API
+Run:
 
 ```bash
-# Build and run the API extractor
-dotnet run --project tools/nodejs.ApiExtractor/nodejs.ApiExtractor.csproj -- tools/nodejs-clr-api.json
+npm run verify:api
 ```
 
-This generates `tools/nodejs-clr-api.json` containing all public APIs from the nodejs assembly.
+This executes `tools/api-verifier/check-node-api.ts`.
 
-### Step 2: Verify Against Node.js Types
+## What the unified verifier checks
 
-```bash
-# Run the TypeScript verifier
-cd tools/api-verifier
-npm run verify
-```
+- parses `@types/node` as the source-of-truth authoring surface
+- parses the generated `@tsonic/nodejs` package output from `../nodejs/versions/10`
+- scans public C# source types under `src/nodejs`
+- verifies internal consistency between:
+  - `node-aliases.d.ts`
+  - generated `bindings.json`
+  - generated facades / internal declarations
+- reports name-level API coverage against Node's builtin modules
+- writes:
+  - `tools/VERIFICATION-SUMMARY.md`
+  - `tools/verification-report.md`
+  - `tools/verification-report.json`
 
-This generates `tools/verification-report.md` showing which APIs match, which are missing, and which are extra.
+## Failure policy
 
-## API Extractor (C#)
+The verifier fails the build on internal contract errors such as:
 
-**Project**: `nodejs.ApiExtractor`
-**Location**: `tools/nodejs.ApiExtractor/`
+- missing `node:` or bare alias declarations
+- missing module bindings
+- divergence between `node:fs` and `fs`
+- divergence between declarations and generated bindings
 
-### What it does:
+It does **not** fail merely because Node coverage is incomplete. Coverage gaps are reported, not silently ignored.
 
-- Uses .NET reflection to inspect the nodejs assembly
-- Extracts all public types, methods, properties
-- Converts C# types to TypeScript-like type names
-- Outputs structured JSON
+## Why this is the right split
 
-### Type Mapping:
+- internal consistency is a correctness invariant and must be green before publish
+- raw Node parity is a roadmap/coverage metric and needs a report, not a blanket fail
 
-| C# Type | JSON Output |
-|---------|-------------|
-| `void` | `"void"` |
-| `string` | `"string"` |
-| `int`, `double` | `"number"` |
-| `bool` | `"boolean"` |
-| `object` | `"any"` |
-| `string[]` | `"string[]"` |
-| `Action<string>` | `"(arg0: string) => void"` |
-| `Func<string, int>` | `"(arg0: string) => number"` |
+## Publish gate
 
-### JSON Schema:
-
-```json
-{
-  "Modules": {
-    "path": {
-      "Name": "path",
-      "IsClass": true,
-      "IsStatic": true,
-      "Methods": [
-        {
-          "Name": "join",
-          "IsStatic": true,
-          "ReturnType": "string",
-          "Parameters": [
-            {
-              "Name": "paths",
-              "Type": "string[]",
-              "IsOptional": false
-            }
-          ]
-        }
-      ],
-      "Properties": []
-    }
-  }
-}
-```
-
-## API Verifier (TypeScript)
-
-**Project**: `api-verifier`
-**Location**: `tools/api-verifier/`
-
-### What it does:
-
-- Uses TypeScript Compiler API to parse @types/node definitions
-- Loads the extracted nodejs API JSON
-- Compares module-level functions, classes, methods, properties
-- Generates markdown report
-
-### Current Limitations:
-
-1. **Namespace Parsing**: Some modules like `path` use namespace declarations which need special handling
-2. **Method Overloads**: Currently checks only presence, not all overload signatures
-3. **Type Compatibility**: Doesn't verify parameter/return type compatibility, only names
-4. **Module Mapping**: Manual mapping between Tsonic module names and Node.js module names
-
-### Comparison Logic:
-
-For static modules (like `path`, `fs`, `crypto`):
-- Compares Tsonic static methods against Node.js module-level functions
-
-For instance classes (like `EventEmitter`, `Buffer`):
-- Compares Tsonic class methods against Node.js class methods
-- Compares Tsonic properties against Node.js properties
-
-## Output
+`../nodejs/scripts/selftest.sh` now runs this verifier before runtime tests and end-to-end consumer tests. That makes API-shape regressions publish-blocking.

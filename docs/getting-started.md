@@ -5,7 +5,7 @@
 ### New project
 
 ```bash
-npx --yes tsonic@latest init --surface nodejs
+npx --yes tsonic@latest init --surface @tsonic/js
 npx --yes tsonic@latest add npm @tsonic/nodejs
 ```
 
@@ -39,6 +39,6 @@ export function main(): void {
 
 ## Notes
 
-- In `--surface nodejs`, prefer Node-style imports (`node:fs`, `node:path`, ...).
+- With `surface: "@tsonic/js"` and `@tsonic/nodejs` installed, prefer Node-style imports (`node:fs`, `node:path`, ...).
 - Tsonic is ESM-first. Import submodules with `.js` for subpaths (example: `@tsonic/nodejs/nodejs.Http.js`).
 - This library is Node-inspired, but many APIs intentionally follow .NET behavior where it improves ergonomics.

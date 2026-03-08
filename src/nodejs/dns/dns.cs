@@ -124,7 +124,7 @@ public static class dns
     /// <param name="callback">Callback function (err, address, family) or (err, addresses) if all=true</param>
     public static void lookup(string hostname, LookupOptions? options, Action<Exception?, string, int> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -162,7 +162,7 @@ public static class dns
     /// </summary>
     public static void lookup(string hostname, LookupOptions? options, Action<Exception?, LookupAddress[]> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -206,7 +206,7 @@ public static class dns
     /// <param name="callback">Callback function (err, hostname, service)</param>
     public static void lookupService(string address, int port, Action<Exception?, string, string> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -322,7 +322,7 @@ public static class dns
     /// <param name="callback">Callback function (err, addresses)</param>
     public static void resolve4(string hostname, Action<Exception?, string[]> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -347,7 +347,7 @@ public static class dns
         if (options.ttl)
         {
             // Note: .NET DNS doesn't provide TTL info, so we return default TTL
-            Task.Run(() =>
+            BackgroundDispatch.Run(() =>
             {
                 try
                 {
@@ -378,7 +378,7 @@ public static class dns
     /// <param name="callback">Callback function (err, addresses)</param>
     public static void resolve6(string hostname, Action<Exception?, string[]> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -402,7 +402,7 @@ public static class dns
     {
         if (options.ttl)
         {
-            Task.Run(() =>
+            BackgroundDispatch.Run(() =>
             {
                 try
                 {
@@ -433,7 +433,7 @@ public static class dns
     /// <param name="callback">Callback function (err, addresses)</param>
     public static void resolveCname(string hostname, Action<Exception?, string[]> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -459,7 +459,7 @@ public static class dns
     /// <param name="callback">Callback function (err, records)</param>
     public static void resolveCaa(string hostname, Action<Exception?, CaaRecord[]> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -483,7 +483,7 @@ public static class dns
     /// <param name="callback">Callback function (err, addresses)</param>
     public static void resolveMx(string hostname, Action<Exception?, MxRecord[]> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -507,7 +507,7 @@ public static class dns
     /// <param name="callback">Callback function (err, addresses)</param>
     public static void resolveNaptr(string hostname, Action<Exception?, NaptrRecord[]> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -530,7 +530,7 @@ public static class dns
     /// <param name="callback">Callback function (err, addresses)</param>
     public static void resolveNs(string hostname, Action<Exception?, string[]> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -553,7 +553,7 @@ public static class dns
     /// <param name="callback">Callback function (err, addresses)</param>
     public static void resolvePtr(string hostname, Action<Exception?, string[]> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -577,7 +577,7 @@ public static class dns
     /// <param name="callback">Callback function (err, address)</param>
     public static void resolveSoa(string hostname, Action<Exception?, SoaRecord> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -600,7 +600,7 @@ public static class dns
     /// <param name="callback">Callback function (err, addresses)</param>
     public static void resolveSrv(string hostname, Action<Exception?, SrvRecord[]> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -623,7 +623,7 @@ public static class dns
     /// <param name="callback">Callback function (err, addresses)</param>
     public static void resolveTlsa(string hostname, Action<Exception?, TlsaRecord[]> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -646,7 +646,7 @@ public static class dns
     /// <param name="callback">Callback function (err, addresses)</param>
     public static void resolveTxt(string hostname, Action<Exception?, string[][]> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -669,7 +669,7 @@ public static class dns
     /// <param name="callback">Callback function (err, addresses)</param>
     public static void resolveAny(string hostname, Action<Exception?, object[]> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
@@ -693,7 +693,7 @@ public static class dns
     /// <param name="callback">Callback function (err, hostnames)</param>
     public static void reverse(string ip, Action<Exception?, string[]> callback)
     {
-        Task.Run(() =>
+        BackgroundDispatch.Run(() =>
         {
             try
             {
