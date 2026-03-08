@@ -10,7 +10,7 @@ Install and enable the bindings package:
 
 ```bash
 # new project
-npx --yes tsonic@latest init --surface nodejs
+npx --yes tsonic@latest init --surface @tsonic/js
 npx --yes tsonic@latest add npm @tsonic/nodejs
 
 # existing project
@@ -61,6 +61,13 @@ Test:
 
 ```bash
 dotnet test
+```
+
+End-to-end package validation lives in the sibling `@tsonic/nodejs` repo:
+
+```bash
+cd ../nodejs
+npm run selftest
 ```
 
 The `@tsonic/nodejs` package is generated from the compiled assembly via **tsbindgen**.

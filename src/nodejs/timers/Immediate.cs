@@ -15,7 +15,7 @@ public class Immediate : IDisposable
 
     private readonly int _handleId;
     private readonly Action _callback;
-    private Timer? _timer;
+    private readonly Thread _thread;
     private bool _isRef = true;
     private bool _disposed = false;
 
@@ -25,7 +25,22 @@ public class Immediate : IDisposable
         _callback = callback;
         ProcessKeepAlive.Acquire();
         ActiveHandles[_handleId] = this;
-        _timer = new Timer(_ => Execute(), null, 1, System.Threading.Timeout.Infinite);
+        _thread = new Thread(ExecuteWhenReady)
+        {
+            IsBackground = true,
+            Name = $"nodejs.Immediate#{_handleId}",
+        };
+        _thread.Start();
+    }
+
+    private void ExecuteWhenReady()
+    {
+        if (SpinWait.SpinUntil(() => Volatile.Read(ref _disposed), TimeSpan.FromMilliseconds(1)))
+        {
+            return;
+        }
+
+        Execute();
     }
 
     private void Execute()
@@ -89,10 +104,7 @@ public class Immediate : IDisposable
         if (!_disposed)
         {
             _disposed = true;
-            var timer = _timer;
-            _timer = null;
             ActiveHandles.TryRemove(_handleId, out _);
-            timer?.Dispose();
             if (_isRef)
             {
                 ProcessKeepAlive.Release();

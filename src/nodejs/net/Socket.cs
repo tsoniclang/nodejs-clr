@@ -143,7 +143,7 @@ public class Socket : Stream
         _connecting = true;
         var hostname = host ?? "localhost";
 
-        Task.Run(async () =>
+        BackgroundDispatch.RunAsync(async () =>
         {
             try
             {
@@ -224,7 +224,7 @@ public class Socket : Stream
             _writeLoopStarted = true;
         }
 
-        _writeLoopTask = Task.Run(async () =>
+        _writeLoopTask = BackgroundDispatch.RunAsync(async () =>
         {
             try
             {
@@ -286,7 +286,7 @@ public class Socket : Stream
         if (_stream != null && !_destroyed)
         {
             // Wait for pending writes to complete before closing (like Node.js)
-            Task.Run(() =>
+            BackgroundDispatch.Run(() =>
             {
                 // Wait for write queue to be empty with timeout
                 _writeQueueEmpty.Wait(TimeSpan.FromSeconds(30));
@@ -503,7 +503,7 @@ public class Socket : Stream
         if (_reading || _stream == null) return;
         _reading = true;
 
-        Task.Run(async () =>
+        BackgroundDispatch.RunAsync(async () =>
         {
             var buffer = new byte[65536]; // 64KB buffer
             try

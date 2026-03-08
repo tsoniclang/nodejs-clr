@@ -119,52 +119,58 @@ public class Server : EventEmitter
 
         _listener = new TcpListener(ipAddress, port);
 
-        Task.Run(() =>
+        try
         {
-            try
-            {
-                _listener.Start(backlog);
-                _listening = true;
-                emit("listening");
+            _listener.Start(backlog);
+            _listening = true;
+            emit("listening");
+        }
+        catch (Exception ex)
+        {
+            emit("error", ex);
+            return this;
+        }
 
-                // Accept connections loop
-                while (_listening)
-                {
-                    try
-                    {
-                        var client = _listener.AcceptTcpClient();
-                        _connections++;
-
-                        var socket = new Socket(client);
-
-                        if (_maxConnections > 0 && _connections > _maxConnections)
-                        {
-                            socket.destroy();
-                            _connections--;
-                            emit("drop", new { });
-                        }
-                        else
-                        {
-                            emit("connection", socket);
-                            // Start reading AFTER emitting connection event
-                            // This allows the connection handler to register data listeners first
-                            socket.StartReading();
-                        }
-                    }
-                    catch (SocketException)
-                    {
-                        // Server stopped
-                        break;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                emit("error", ex);
-            }
-        });
+        BackgroundDispatch.Run(AcceptConnectionsLoop, "nodejs.Server.AcceptConnections");
 
         return this;
+    }
+
+    private void AcceptConnectionsLoop()
+    {
+        try
+        {
+            while (_listening)
+            {
+                try
+                {
+                    var client = _listener!.AcceptTcpClient();
+                    _connections++;
+
+                    var socket = new Socket(client);
+
+                    if (_maxConnections > 0 && _connections > _maxConnections)
+                    {
+                        socket.destroy();
+                        _connections--;
+                        emit("drop", new { });
+                    }
+                    else
+                    {
+                        emit("connection", socket);
+                        socket.StartReading();
+                    }
+                }
+                catch (SocketException)
+                {
+                    break;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            emit("error", ex);
+        }
     }
 
     /// <summary>
