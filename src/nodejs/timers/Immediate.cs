@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
+using System.Threading.Tasks;
 using Tsonic.JSRuntime;
 
 namespace nodejs;
@@ -15,7 +16,7 @@ public class Immediate : IDisposable
 
     private readonly int _handleId;
     private readonly Action _callback;
-    private readonly Thread _thread;
+    private readonly CancellationTokenSource _cancellation = new();
     private bool _isRef = true;
     private bool _disposed = false;
 
@@ -25,33 +26,20 @@ public class Immediate : IDisposable
         _callback = callback;
         ProcessKeepAlive.Acquire();
         ActiveHandles[_handleId] = this;
-        _thread = new Thread(ExecuteWhenReady)
-        {
-            IsBackground = true,
-            Name = $"nodejs.Immediate#{_handleId}",
-        };
-        _thread.Start();
+        _ = BackgroundDispatch.RunAsync(ExecuteWhenReadyAsync, $"nodejs.Immediate#{_handleId}");
     }
 
-    private void ExecuteWhenReady()
+    private async Task ExecuteWhenReadyAsync()
     {
-        if (SpinWait.SpinUntil(() => Volatile.Read(ref _disposed), TimeSpan.FromMilliseconds(1)))
-        {
-            return;
-        }
-
-        Execute();
-    }
-
-    private void Execute()
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
         try
         {
+            await Task.Yield();
+
+            if (_cancellation.IsCancellationRequested || Volatile.Read(ref _disposed))
+            {
+                return;
+            }
+
             _callback();
         }
         finally
@@ -104,6 +92,7 @@ public class Immediate : IDisposable
         if (!_disposed)
         {
             _disposed = true;
+            _cancellation.Cancel();
             ActiveHandles.TryRemove(_handleId, out _);
             if (_isRef)
             {

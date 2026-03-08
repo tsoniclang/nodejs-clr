@@ -15,7 +15,8 @@
   "scripts": {
     "test": "dotnet test",
     "build": "dotnet build",
-    "pack": "dotnet pack src/nodejs/nodejs.csproj -c Release"
+    "pack": "dotnet pack src/nodejs/nodejs.csproj -c Release",
+    "verify:api": "npm --prefix tools/api-verifier run check"
   },
   "repository": {
     "type": "git",
