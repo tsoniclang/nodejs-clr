@@ -1251,7 +1251,7 @@
       "packageReferences": [
         {
           "id": "Tsonic.Nodejs",
-          "version": "1.0.1",
+          "version": "1.0.3",
           "types": "@tsonic/nodejs"
         }
       ]
