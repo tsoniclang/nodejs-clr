@@ -71,23 +71,27 @@ public class SocketTests
     public void Socket_Connect_StartsConnection()
     {
         var socket = new Socket();
-        var resetEvent = new ManualResetEventSlim(false);
+        var server = net.createServer();
+        var listenEvent = new ManualResetEventSlim(false);
+        var connectEvent = new ManualResetEventSlim(false);
+        var observedConnecting = false;
 
-        socket.on("error", (Exception err) =>
+        server.listen(0, "127.0.0.1", () =>
         {
-            resetEvent.Set();
+            socket.connect(GetListeningPort(server), "127.0.0.1", () =>
+            {
+                connectEvent.Set();
+            });
+            observedConnecting = socket.connecting || socket.readyState == "opening" || socket.readyState == "open";
+            listenEvent.Set();
         });
 
-        socket.connect(TEST_PORT, "localhost", () =>
-        {
-            resetEvent.Set();
-        });
+        Assert.True(listenEvent.Wait(2000), "Server should start listening");
+        Assert.True(observedConnecting, "Socket should begin opening or already be open");
+        Assert.True(connectEvent.Wait(5000), "Connect callback should be invoked");
 
-        // Should be connecting
-        Assert.True(socket.connecting || socket.readyState == "opening");
-
-        resetEvent.Wait(2000);
-        // Connection will likely fail since no server is running, that's okay
+        server.close();
+        socket.destroy();
     }
 
     [Fact]
