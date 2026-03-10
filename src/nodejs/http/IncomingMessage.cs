@@ -20,6 +20,7 @@ public partial class IncomingMessage : EventEmitter
     private readonly HttpResponseMessage? _clientResponse;
     private readonly string? _body;
     private bool _isServerSide;
+    private bool _clientBodyEmitted;
 
     // Server-side constructor
     internal IncomingMessage(HttpRequest request)
@@ -85,7 +86,7 @@ public partial class IncomingMessage : EventEmitter
     /// <summary>
     /// Response status code (client-side) or null (server-side).
     /// </summary>
-    public double? statusCode => _isServerSide ? null : (double?)_clientResponse?.StatusCode;
+    public int? statusCode => _isServerSide ? null : (int?)_clientResponse?.StatusCode;
 
     /// <summary>
     /// Response status message (client-side) or null (server-side).
@@ -117,9 +118,9 @@ public partial class IncomingMessage : EventEmitter
     /// <param name="msecs">Timeout in milliseconds.</param>
     /// <param name="callback">Optional callback for timeout event.</param>
     /// <returns>The IncomingMessage instance.</returns>
-    public IncomingMessage setTimeout(double msecs, Action? callback = null)
+    public IncomingMessage setTimeout(int msecs, Action? callback = null)
     {
-        JsNumeric.RequireFiniteNonNegative(msecs, nameof(msecs));
+        JsNumeric.RequireNonNegativeInt(msecs, nameof(msecs));
 
         if (callback != null)
         {
@@ -149,8 +150,7 @@ public partial class IncomingMessage : EventEmitter
         }
         else if (_body != null)
         {
-            complete = true;
-            emit("end");
+            EmitBufferedClientBody();
             return _body;
         }
 
@@ -180,5 +180,24 @@ public partial class IncomingMessage : EventEmitter
     public void onClose(Action callback)
     {
         on("close", callback);
+    }
+
+    internal void EmitBufferedClientBody()
+    {
+        if (_isServerSide || _clientBodyEmitted)
+        {
+            return;
+        }
+
+        _clientBodyEmitted = true;
+
+        if (!string.IsNullOrEmpty(_body))
+        {
+            emit("data", _body);
+        }
+
+        complete = true;
+        emit("end");
+        emit("close");
     }
 }

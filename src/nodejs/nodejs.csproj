@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyName>nodejs</AssemblyName>
     <RootNamespace>nodejs</RootNamespace>
-    <Version>1.0.4</Version>
+    <Version>1.0.6</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <!-- Package settings -->

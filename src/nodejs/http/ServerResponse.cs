@@ -25,14 +25,14 @@ public partial class ServerResponse : EventEmitter
     /// <summary>
     /// Gets or sets the HTTP status code that will be sent to the client.
     /// </summary>
-    public double statusCode
+    public int statusCode
     {
         get => _response.StatusCode;
         set
         {
             if (_headersSent)
                 throw new InvalidOperationException("Cannot set status code after headers have been sent");
-            _response.StatusCode = JsNumeric.ToExactInt32(value, nameof(statusCode));
+            _response.StatusCode = value;
         }
     }
 
@@ -61,12 +61,12 @@ public partial class ServerResponse : EventEmitter
     /// <param name="statusMessage">Optional status message (ignored in HTTP/2).</param>
     /// <param name="headers">Optional headers object.</param>
     /// <returns>The ServerResponse instance for chaining.</returns>
-    public ServerResponse writeHead(double statusCode, string? statusMessage = null, Dictionary<string, string>? headers = null)
+    public ServerResponse writeHead(int statusCode, string? statusMessage = null, Dictionary<string, string>? headers = null)
     {
         if (_headersSent)
             throw new InvalidOperationException("Headers already sent");
 
-        _response.StatusCode = JsNumeric.ToExactInt32(statusCode, nameof(statusCode));
+        _response.StatusCode = statusCode;
 
         if (statusMessage != null)
             this.statusMessage = statusMessage;
@@ -89,7 +89,7 @@ public partial class ServerResponse : EventEmitter
     /// <param name="statusCode">The HTTP status code.</param>
     /// <param name="headers">Headers object.</param>
     /// <returns>The ServerResponse instance for chaining.</returns>
-    public ServerResponse writeHead(double statusCode, Dictionary<string, string> headers)
+    public ServerResponse writeHead(int statusCode, Dictionary<string, string> headers)
     {
         return writeHead(statusCode, null, headers);
     }
@@ -290,9 +290,9 @@ public partial class ServerResponse : EventEmitter
     /// <param name="msecs">Timeout in milliseconds.</param>
     /// <param name="callback">Optional callback for timeout event.</param>
     /// <returns>The ServerResponse instance.</returns>
-    public ServerResponse setTimeout(double msecs, Action? callback = null)
+    public ServerResponse setTimeout(int msecs, Action? callback = null)
     {
-        JsNumeric.RequireFiniteNonNegative(msecs, nameof(msecs));
+        JsNumeric.RequireNonNegativeInt(msecs, nameof(msecs));
 
         if (callback != null)
         {

@@ -33,7 +33,7 @@ public class Immediate : IDisposable
     {
         try
         {
-            await Task.Yield();
+            await Task.Delay(1, _cancellation.Token);
 
             if (_cancellation.IsCancellationRequested || Volatile.Read(ref _disposed))
             {
@@ -41,6 +41,10 @@ public class Immediate : IDisposable
             }
 
             _callback();
+        }
+        catch (OperationCanceledException)
+        {
+            // clearImmediate cancelled execution before the deferred callback ran.
         }
         finally
         {

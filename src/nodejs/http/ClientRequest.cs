@@ -217,6 +217,12 @@ public partial class ClientRequest : EventEmitter
         var incomingMessage = new IncomingMessage(response, body);
 
         emit("response", incomingMessage);
+
+        _ = BackgroundDispatch.RunAsync(async () =>
+        {
+            await Task.Yield();
+            incomingMessage.EmitBufferedClientBody();
+        }, "nodejs.Http.ClientRequest.ResponseBody");
     }
 
     /// <summary>
