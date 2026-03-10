@@ -1,8 +1,8 @@
 # Importing Modules
 
-## Preferred in `--surface nodejs`: Node-style specifiers
+## Preferred with `surface: "@tsonic/js"` and `@tsonic/nodejs`: Node-style specifiers
 
-With Node surface enabled, import using Node module names:
+With `surface: "@tsonic/js"` and `@tsonic/nodejs` installed, import using Node module names:
 
 ```ts
 import { readFileSync } from "node:fs";
@@ -38,5 +38,3 @@ Some namespaces are emitted as separate entry points. Example:
 ```ts
 import { http, IncomingMessage, ServerResponse } from "@tsonic/nodejs/nodejs.Http.js";
 ```
-
-`node:http` is currently not mapped by the surface alias set.

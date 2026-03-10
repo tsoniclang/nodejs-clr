@@ -1,6 +1,6 @@
 # Node.js Compatibility (`@tsonic/nodejs`)
 
-Tsonic targets the .NET BCL by default. If you want **Node-style APIs** (`fs`, `path`, `crypto`, `net`, `process`, ...), use `@tsonic/nodejs` and set `--surface nodejs`.
+Tsonic targets the .NET BCL by default. If you want **Node-style APIs** (`fs`, `path`, `crypto`, `net`, `process`, ...), use `@tsonic/nodejs` in a workspace with `surface: "@tsonic/js"`.
 
 This is **not** Node.js itself, and it is **not a byte-for-byte clone** of the Node standard library. It is a curated, Node-inspired API surface implemented on .NET for Tsonic projects.
 
