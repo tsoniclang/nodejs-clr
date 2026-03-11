@@ -126,6 +126,33 @@ public class TimersTests
     }
 
     [Fact]
+    public void setImmediate_ShouldExecuteCallback_Reliably()
+    {
+        for (var index = 0; index < 10; index++)
+        {
+            var resetEvent = new ManualResetEventSlim(false);
+            var executed = false;
+
+            var immediate = timers.setImmediate(() =>
+            {
+                executed = true;
+                resetEvent.Set();
+            });
+
+            try
+            {
+                var signaled = resetEvent.Wait(1000);
+                Assert.True(signaled, $"setImmediate callback was not called within timeout on iteration {index}");
+                Assert.True(executed);
+            }
+            finally
+            {
+                timers.clearImmediate(immediate);
+            }
+        }
+    }
+
+    [Fact]
     public void setImmediate_ShouldReturnImmediate()
     {
         var immediate = timers.setImmediate(() => { });
@@ -143,6 +170,21 @@ public class TimersTests
         Thread.Sleep(100);
 
         Assert.False(executed);
+    }
+
+    [Fact]
+    public void clearImmediate_ShouldCancelImmediate_Reliably()
+    {
+        for (var index = 0; index < 10; index++)
+        {
+            var executed = false;
+            var immediate = timers.setImmediate(() => executed = true);
+
+            timers.clearImmediate(immediate);
+            Thread.Sleep(20);
+
+            Assert.False(executed);
+        }
     }
 
     [Fact]

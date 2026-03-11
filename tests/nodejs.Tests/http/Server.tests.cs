@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
@@ -153,6 +154,77 @@ public class HttpServerTests
     }
 
     [Fact]
+    public void Server_Address_ReturnsBoundAddressInfo()
+    {
+        var port = 18086;
+        var server = http.createServer((req, res) => res.end("OK"));
+
+        server.listen(port, "127.0.0.1", (Action?)null);
+
+        try
+        {
+            var address = server.address();
+
+            Assert.NotNull(address);
+            Assert.Equal(port, address.port);
+            Assert.Equal("127.0.0.1", address.address);
+            Assert.Equal("IPv4", address.family);
+        }
+        finally
+        {
+            server.close();
+        }
+    }
+
+    [Fact]
+    public void Server_Address_WithEphemeralPort_ReturnsAssignedPort()
+    {
+        var server = http.createServer((req, res) => res.end("OK"));
+
+        server.listen(0, "127.0.0.1", (Action?)null);
+
+        try
+        {
+            var address = server.address();
+
+            Assert.NotNull(address);
+            Assert.True(address.port > 0);
+            Assert.Equal("127.0.0.1", address.address);
+            Assert.Equal("IPv4", address.family);
+        }
+        finally
+        {
+            server.close();
+        }
+    }
+
+    [Fact]
+    public void Server_Listen_Callback_SeesBoundAddress()
+    {
+        nodejs.Http.AddressInfo? callbackAddress = null;
+        var callback = false;
+        var server = http.createServer((req, res) => res.end("OK"));
+
+        server.listen(0, "127.0.0.1", null, () =>
+        {
+            callback = true;
+            callbackAddress = server.address();
+        });
+
+        try
+        {
+            Assert.True(callback);
+            Assert.NotNull(callbackAddress);
+            Assert.True(callbackAddress.port > 0);
+            Assert.Equal("127.0.0.1", callbackAddress.address);
+        }
+        finally
+        {
+            server.close();
+        }
+    }
+
+    [Fact]
     public async Task Server_Close_StopsAcceptingConnections()
     {
         // Arrange
@@ -174,13 +246,13 @@ public class HttpServerTests
     }
 
     [Fact]
-    public async Task ServerResponse_StatusCode_AcceptsIntegralDoubleValues()
+    public async Task ServerResponse_StatusCode_UsesExactIntContract()
     {
-        var port = 18085d;
+        var port = 18085;
 
         var server = http.createServer((req, res) =>
         {
-            res.statusCode = 204d;
+            res.statusCode = 204;
             res.end();
         });
 
@@ -201,11 +273,48 @@ public class HttpServerTests
     }
 
     [Fact]
-    public void Server_Listen_WithFractionalPort_Throws()
+    public async Task HttpGet_Response_EmitsDataAndEndEvents()
+    {
+        var port = 18087;
+        var chunks = new List<string>();
+        var end = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        var server = http.createServer((req, res) =>
+        {
+            res.end("payload");
+        });
+
+        server.listen(port, (Action?)null);
+
+        try
+        {
+            http.get($"http://127.0.0.1:{port}/", (res) =>
+            {
+                res.on("data", (string chunk) =>
+                {
+                    chunks.Add(chunk);
+                });
+                res.on("end", () =>
+                {
+                    end.TrySetResult();
+                });
+            });
+
+            await end.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            Assert.Equal(new[] { "payload" }, chunks);
+        }
+        finally
+        {
+            server.close();
+        }
+    }
+
+    [Fact]
+    public void Server_Listen_WithOutOfRangePort_Throws()
     {
         var server = http.createServer((req, res) => res.end("OK"));
 
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            server.listen(18086.5d, (Action?)null));
+            server.listen(70000, (Action?)null));
     }
 }

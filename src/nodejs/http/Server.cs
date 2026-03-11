@@ -1,10 +1,15 @@
 using System;
 using System.Net;
+using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using nodejs;
 using Tsonic.JSRuntime;
@@ -20,12 +25,13 @@ namespace nodejs.Http;
 public partial class Server : EventEmitter
 {
     private IWebHost? _host;
+    private AddressInfo? _boundAddress;
     private readonly Action<IncomingMessage, ServerResponse>? _requestListener;
     private int _maxHeadersCount = 2000;
-    private double _timeout = 0; // 0 means no timeout (Node.js default)
-    private double _headersTimeout = 60000; // 60 seconds (Node.js default)
-    private double _requestTimeout = 300000; // 300 seconds (5 minutes, Node.js default)
-    private double _keepAliveTimeout = 5000; // 5 seconds (Node.js default)
+    private int _timeout = 0; // 0 means no timeout (Node.js default)
+    private int _headersTimeout = 60000; // 60 seconds (Node.js default)
+    private int _requestTimeout = 300000; // 300 seconds (5 minutes, Node.js default)
+    private int _keepAliveTimeout = 5000; // 5 seconds (Node.js default)
     private bool _listening = false;
 
     private static IPAddress ResolveHostname(string hostname)
@@ -78,30 +84,30 @@ public partial class Server : EventEmitter
     /// Sets the timeout value in milliseconds for receiving the entire request from the client.
     /// Default: 0 (no timeout)
     /// </summary>
-    public double timeout
+    public int timeout
     {
         get => _timeout;
-        set => _timeout = JsNumeric.RequireFiniteNonNegative(value, nameof(timeout));
+        set => _timeout = JsNumeric.RequireNonNegativeInt(value, nameof(timeout));
     }
 
     /// <summary>
     /// Limits the amount of time the parser will wait to receive the complete HTTP headers.
     /// Default: 60000 (60 seconds)
     /// </summary>
-    public double headersTimeout
+    public int headersTimeout
     {
         get => _headersTimeout;
-        set => _headersTimeout = JsNumeric.RequireFiniteNonNegative(value, nameof(headersTimeout));
+        set => _headersTimeout = JsNumeric.RequireNonNegativeInt(value, nameof(headersTimeout));
     }
 
     /// <summary>
     /// Sets the timeout value in milliseconds for receiving the entire request from the client.
     /// Default: 300000 (5 minutes)
     /// </summary>
-    public double requestTimeout
+    public int requestTimeout
     {
         get => _requestTimeout;
-        set => _requestTimeout = JsNumeric.RequireFiniteNonNegative(value, nameof(requestTimeout));
+        set => _requestTimeout = JsNumeric.RequireNonNegativeInt(value, nameof(requestTimeout));
     }
 
     /// <summary>
@@ -109,10 +115,10 @@ public partial class Server : EventEmitter
     /// before a socket will be destroyed.
     /// Default: 5000 (5 seconds)
     /// </summary>
-    public double keepAliveTimeout
+    public int keepAliveTimeout
     {
         get => _keepAliveTimeout;
-        set => _keepAliveTimeout = JsNumeric.RequireFiniteNonNegative(value, nameof(keepAliveTimeout));
+        set => _keepAliveTimeout = JsNumeric.RequireNonNegativeInt(value, nameof(keepAliveTimeout));
     }
 
     /// <summary>
@@ -128,17 +134,22 @@ public partial class Server : EventEmitter
     /// <param name="backlog">Maximum length of the queue of pending connections (ignored in Kestrel).</param>
     /// <param name="callback">Optional callback when server has been started.</param>
     /// <returns>The server instance for chaining.</returns>
-    public Server listen(double port, string? hostname = null, double? backlog = null, Action? callback = null)
+    public Server listen(int port, string? hostname = null, int? backlog = null, Action? callback = null)
     {
         if (_listening)
         {
             throw new InvalidOperationException("Server is already listening");
         }
 
-        var normalizedPort = JsNumeric.ToPort(port, nameof(port));
+        var normalizedPort = JsNumeric.RequirePort(port, nameof(port));
+        var resolvedHostname = string.IsNullOrEmpty(hostname) ? null : ResolveHostname(hostname);
+        var listenPort = normalizedPort == 0
+            ? ReserveEphemeralPort(resolvedHostname ?? IPAddress.Loopback)
+            : normalizedPort;
+
         if (backlog.HasValue)
         {
-            JsNumeric.RequireFiniteNonNegative(backlog.Value, nameof(backlog));
+            JsNumeric.RequireNonNegativeInt(backlog.Value, nameof(backlog));
         }
 
         // Use minimal WebHost setup to avoid file watchers
@@ -148,7 +159,7 @@ public partial class Server : EventEmitter
                 if (string.IsNullOrEmpty(hostname))
                 {
                     // Listen on all interfaces
-                    options.ListenAnyIP(normalizedPort, listenOptions =>
+                    options.ListenAnyIP(listenPort, listenOptions =>
                     {
                         listenOptions.Protocols = HttpProtocols.Http1;
                     });
@@ -156,7 +167,7 @@ public partial class Server : EventEmitter
                 else
                 {
                     // Listen on specific hostname
-                    options.Listen(ResolveHostname(hostname), normalizedPort, listenOptions =>
+                    options.Listen(resolvedHostname!, listenPort, listenOptions =>
                     {
                         listenOptions.Protocols = HttpProtocols.Http1;
                     });
@@ -192,6 +203,12 @@ public partial class Server : EventEmitter
         {
             _host.Start();
             _listening = true;
+            _boundAddress = ResolveBoundAddress() ?? new AddressInfo
+            {
+                address = resolvedHostname?.ToString() ?? IPAddress.Loopback.ToString(),
+                family = (resolvedHostname ?? IPAddress.Loopback).AddressFamily == AddressFamily.InterNetwork ? "IPv4" : "IPv6",
+                port = listenPort
+            };
             emit("listening");
             callback?.Invoke();
             return this;
@@ -211,7 +228,7 @@ public partial class Server : EventEmitter
     /// <param name="port">The port number.</param>
     /// <param name="callback">Optional callback when server has been started.</param>
     /// <returns>The server instance for chaining.</returns>
-    public Server listen(double port, Action? callback)
+    public Server listen(int port, Action? callback)
     {
         return listen(port, null, null, callback);
     }
@@ -219,7 +236,7 @@ public partial class Server : EventEmitter
     /// <summary>
     /// Begin accepting connections on the specified port and hostname.
     /// </summary>
-    public Server listen(double port, string hostname, Action? callback)
+    public Server listen(int port, string hostname, Action? callback)
     {
         return listen(port, hostname, null, callback);
     }
@@ -231,28 +248,33 @@ public partial class Server : EventEmitter
     /// <returns>The server instance for chaining.</returns>
     public Server close(Action? callback = null)
     {
-        _ = closeAsync(callback);
-        return this;
-    }
-
-    private async Task closeAsync(Action? callback)
-    {
-        if (_host != null)
+        if (_host == null)
         {
-            try
-            {
-                await _host.StopAsync();
-                _host.Dispose();
-            }
-            finally
-            {
-                _host = null;
-                _listening = false;
-                ProcessKeepAlive.Release();
-                emit("close");
-                callback?.Invoke();
-            }
+            callback?.Invoke();
+            return this;
         }
+
+        try
+        {
+            using var shutdownCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+            _host.StopAsync(shutdownCts.Token).GetAwaiter().GetResult();
+        }
+        catch (OperationCanceledException)
+        {
+            // Fall back to dispose below if graceful shutdown takes too long.
+        }
+        finally
+        {
+            _host.Dispose();
+            _boundAddress = null;
+            _host = null;
+            _listening = false;
+            ProcessKeepAlive.Release();
+            emit("close");
+            callback?.Invoke();
+        }
+
+        return this;
     }
 
     /// <summary>
@@ -261,9 +283,9 @@ public partial class Server : EventEmitter
     /// <param name="msecs">Timeout in milliseconds.</param>
     /// <param name="callback">Optional callback to be added as a listener on the 'timeout' event.</param>
     /// <returns>The server instance for chaining.</returns>
-    public Server setTimeout(double msecs, Action? callback = null)
+    public Server setTimeout(int msecs, Action? callback = null)
     {
-        _timeout = JsNumeric.RequireFiniteNonNegative(msecs, nameof(msecs));
+        _timeout = JsNumeric.RequireNonNegativeInt(msecs, nameof(msecs));
 
         if (callback != null)
         {
@@ -280,10 +302,54 @@ public partial class Server : EventEmitter
     /// <returns>An object with 'port', 'family', and 'address' properties.</returns>
     public AddressInfo? address()
     {
-        // In Kestrel, we don't have easy access to the bound address
-        // This would require storing the listen parameters
-        // For now, return null if not implemented
-        return null;
+        return _boundAddress;
+    }
+
+    private AddressInfo? ResolveBoundAddress()
+    {
+        var boundAddress =
+            _host?.ServerFeatures.Get<IServerAddressesFeature>()?.Addresses?.FirstOrDefault()
+            ?? _host?.Services.GetService<IServer>()?.Features.Get<IServerAddressesFeature>()?.Addresses?.FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(boundAddress))
+        {
+            return null;
+        }
+
+        if (!Uri.TryCreate(boundAddress, UriKind.Absolute, out var uri))
+        {
+            return null;
+        }
+
+        var host = uri.Host;
+        if (string.IsNullOrEmpty(host))
+        {
+            host = "0.0.0.0";
+        }
+
+        var family = IPAddress.TryParse(host, out var parsed)
+            ? parsed.AddressFamily == AddressFamily.InterNetwork ? "IPv4" : "IPv6"
+            : "IPv4";
+
+        return new AddressInfo
+        {
+            address = host,
+            family = family,
+            port = uri.Port
+        };
+    }
+
+    private static int ReserveEphemeralPort(IPAddress address)
+    {
+        var listener = new TcpListener(address, 0);
+        listener.Start();
+        try
+        {
+            return ((IPEndPoint)listener.LocalEndpoint).Port;
+        }
+        finally
+        {
+            listener.Stop();
+        }
     }
 }
 
