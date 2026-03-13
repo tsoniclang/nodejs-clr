@@ -11,44 +11,111 @@ namespace nodejs;
 /// </summary>
 public class Immediate : IDisposable
 {
+    private const int DispatchGraceMilliseconds = 10;
+    private const int StateScheduled = 0;
+    private const int StateRunning = 1;
+    private const int StateCompleted = 2;
+    private const int StateCancelled = 3;
+
     private static int _nextHandleId = 0;
     private static readonly ConcurrentDictionary<int, Immediate> ActiveHandles = new();
+    private static readonly ConcurrentQueue<Immediate> PendingHandles = new();
+    private static int _dispatchScheduled = 0;
 
     private readonly int _handleId;
     private readonly Action _callback;
     private readonly CancellationTokenSource _cancellation = new();
+    private readonly long _readyAfterTick;
+    private int _state = StateScheduled;
+    private int _cleanupState = 0;
     private bool _isRef = true;
-    private bool _disposed = false;
 
     internal Immediate(Action callback)
     {
         _handleId = Interlocked.Increment(ref _nextHandleId);
         _callback = callback;
+        _readyAfterTick = Environment.TickCount64 + DispatchGraceMilliseconds;
         ProcessKeepAlive.Acquire();
         ActiveHandles[_handleId] = this;
-        _ = BackgroundDispatch.RunAsync(ExecuteWhenReadyAsync, $"nodejs.Immediate#{_handleId}");
+        PendingHandles.Enqueue(this);
+        ScheduleDispatch();
     }
 
-    private async Task ExecuteWhenReadyAsync()
+    private static void ScheduleDispatch()
     {
-        try
+        if (Interlocked.CompareExchange(ref _dispatchScheduled, 1, 0) != 0)
         {
-            await Task.Delay(1, _cancellation.Token);
+            return;
+        }
 
-            if (_cancellation.IsCancellationRequested || Volatile.Read(ref _disposed))
+        _ = BackgroundDispatch.RunAsync(DispatchPendingAsync, "nodejs.Immediate.dispatch");
+    }
+
+    private static async Task DispatchPendingAsync()
+    {
+        while (true)
+        {
+            await Task.Delay(1);
+
+            var batchCount = PendingHandles.Count;
+            for (var index = 0; index < batchCount; index++)
+            {
+                if (!PendingHandles.TryDequeue(out var handle))
+                {
+                    break;
+                }
+
+                handle.TryExecute();
+            }
+
+            Interlocked.Exchange(ref _dispatchScheduled, 0);
+            if (PendingHandles.IsEmpty)
             {
                 return;
             }
 
-            _callback();
+            if (Interlocked.CompareExchange(ref _dispatchScheduled, 1, 0) != 0)
+            {
+                return;
+            }
         }
-        catch (OperationCanceledException)
+    }
+
+    private void TryExecute()
+    {
+        try
         {
-            // clearImmediate cancelled execution before the deferred callback ran.
+            if (Volatile.Read(ref _state) != StateScheduled)
+            {
+                return;
+            }
+
+            if (Environment.TickCount64 < _readyAfterTick)
+            {
+                PendingHandles.Enqueue(this);
+                return;
+            }
+
+            if (Interlocked.CompareExchange(ref _state, StateRunning, StateScheduled) != StateScheduled)
+            {
+                return;
+            }
+
+            if (_cancellation.IsCancellationRequested)
+            {
+                Interlocked.Exchange(ref _state, StateCancelled);
+                return;
+            }
+
+            _callback();
+            Interlocked.Exchange(ref _state, StateCompleted);
         }
         finally
         {
-            Dispose();
+            if (Volatile.Read(ref _state) is StateCompleted or StateCancelled)
+            {
+                Cleanup();
+            }
         }
     }
 
@@ -58,7 +125,7 @@ public class Immediate : IDisposable
     /// </summary>
     public Immediate @ref()
     {
-        if (!_disposed && !_isRef)
+        if (Volatile.Read(ref _cleanupState) == 0 && !_isRef)
         {
             ProcessKeepAlive.Acquire();
         }
@@ -72,7 +139,7 @@ public class Immediate : IDisposable
     /// </summary>
     public Immediate unref()
     {
-        if (!_disposed && _isRef)
+        if (Volatile.Read(ref _cleanupState) == 0 && _isRef)
         {
             ProcessKeepAlive.Release();
         }
@@ -93,16 +160,30 @@ public class Immediate : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (!_disposed)
+        if (Interlocked.CompareExchange(ref _state, StateCancelled, StateScheduled) == StateScheduled)
         {
-            _disposed = true;
             _cancellation.Cancel();
-            ActiveHandles.TryRemove(_handleId, out _);
-            if (_isRef)
-            {
-                ProcessKeepAlive.Release();
-            }
+            Cleanup();
         }
+        else if (Volatile.Read(ref _state) is StateCompleted or StateCancelled)
+        {
+            Cleanup();
+        }
+    }
+
+    private void Cleanup()
+    {
+        if (Interlocked.Exchange(ref _cleanupState, 1) != 0)
+        {
+            return;
+        }
+
+        ActiveHandles.TryRemove(_handleId, out _);
+        if (_isRef)
+        {
+            ProcessKeepAlive.Release();
+        }
+        _cancellation.Dispose();
         GC.SuppressFinalize(this);
     }
 }
