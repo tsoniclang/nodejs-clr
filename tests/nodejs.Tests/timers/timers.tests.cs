@@ -188,6 +188,55 @@ public class TimersTests
     }
 
     [Fact]
+    public void clearImmediate_ShouldCancelImmediate_AtScale()
+    {
+        for (var index = 0; index < 100; index++)
+        {
+            var resetEvent = new ManualResetEventSlim(false);
+            var executed = false;
+            var immediate = timers.setImmediate(() =>
+            {
+                executed = true;
+                resetEvent.Set();
+            });
+
+            timers.clearImmediate(immediate);
+
+            var signaled = resetEvent.Wait(20);
+            Assert.False(signaled, $"Cancelled immediate executed on iteration {index}");
+            Assert.False(executed, $"Cancelled immediate executed on iteration {index}");
+        }
+    }
+
+    [Fact]
+    public void clearImmediate_ShouldCancelAllPendingImmediates()
+    {
+        var resetEvent = new ManualResetEventSlim(false);
+        var executedCount = 0;
+        var immediates = new Immediate[32];
+
+        for (var index = 0; index < immediates.Length; index++)
+        {
+            immediates[index] = timers.setImmediate(() =>
+            {
+                if (Interlocked.Increment(ref executedCount) == 1)
+                {
+                    resetEvent.Set();
+                }
+            });
+        }
+
+        for (var index = 0; index < immediates.Length; index++)
+        {
+            timers.clearImmediate(immediates[index]);
+        }
+
+        var signaled = resetEvent.Wait(20);
+        Assert.False(signaled, "At least one cancelled immediate executed");
+        Assert.Equal(0, executedCount);
+    }
+
+    [Fact]
     public void clearImmediate_WithNull_ShouldNotThrow()
     {
         timers.clearImmediate(null);
