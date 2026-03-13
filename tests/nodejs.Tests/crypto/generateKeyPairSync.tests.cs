@@ -69,6 +69,20 @@ public class generateKeyPairSyncTests
     }
 
     [Fact]
+    public void generateKeyPairSync_DH_GeneratesKeys_Reliably()
+    {
+        for (var i = 0; i < 8; i++)
+        {
+            var (publicKey, privateKey) = crypto.generateKeyPairSync("dh", null);
+
+            Assert.NotNull(publicKey);
+            Assert.NotNull(privateKey);
+            Assert.Equal("secret", publicKey.type);
+            Assert.Equal("secret", privateKey.type);
+        }
+    }
+
+    [Fact]
     public void generateKeyPairSync_InvalidType_Throws()
     {
         Assert.Throws<ArgumentException>(() => crypto.generateKeyPairSync("invalid", null));

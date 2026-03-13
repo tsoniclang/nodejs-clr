@@ -486,9 +486,10 @@ public static partial class crypto
         }
         else if (keyType == "dh")
         {
-            // Generate DH key pair using createDiffieHellman
-            // Default to 2048-bit prime for security
-            var dh = createDiffieHellman(2048);
+            // Use a standard 2048-bit MODP group for the default DH keypair path.
+            // Generating fresh 2048-bit DH parameters here is unnecessarily expensive
+            // and makes the synchronous API unstable under full-suite execution.
+            var dh = getDiffieHellman("modp14");
             dh.generateKeys();
 
             // Export keys (this is a simplification - real implementation would need proper KeyObject wrappers)
