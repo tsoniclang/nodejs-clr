@@ -1,77 +1,16 @@
 # nodejs-clr
 
-`nodejs-clr` is a **.NET library** that provides Node-style APIs (filesystem, path, crypto, networking, etc.) for Tsonic projects.
+This repo is retired.
 
-It is Node-inspired (familiar ergonomics), but it is **not** Node.js itself and it is **not an exact replica** of the Node standard library.
+`@tsonic/nodejs` is now the first-party source-of-truth package for Node APIs in Tsonic. The package surface, exports, and behavior authority live in `nodejs/versions/10/src`, and this repo is no longer part of the active architecture or publish wave.
 
-## For Tsonic Users
+## Status
 
-Install and enable the bindings package:
+- Not part of the active Tsonic architecture
+- No longer the source of truth for `@tsonic/nodejs`
+- Kept only as an archival reference
 
-```bash
-# new project
-npx --yes tsonic@latest init --surface @tsonic/js
-npx --yes tsonic@latest add npm @tsonic/nodejs
+## Use instead
 
-# existing project
-npx --yes tsonic@latest add npm @tsonic/nodejs
-```
-
-Then write natural Node-style code:
-
-```ts
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
-export function main(): void {
-  const p = join("a", "b", "c");
-  console.log(p);
-  console.log(readFileSync("./README.md", "utf-8"));
-}
-```
-
-Some namespaces are emitted as separate ESM entry points (for example `nodejs.Http`) and are imported via a subpath:
-
-```ts
-import { http } from "@tsonic/nodejs/nodejs.Http.js";
-```
-
-Direct imports from `@tsonic/nodejs/index.js` remain supported.
-
-Documentation:
-
-- `docs/README.md`
+- `@tsonic/nodejs`
 - https://tsonic.org/nodejs/
-
-## For Contributors
-
-Build:
-
-```bash
-dotnet build
-```
-
-If `dotnet build` fails with "Build FAILED" but no errors (some sandboxed environments block MSBuild node sockets), try:
-
-```bash
-dotnet build -- -maxcpucount:1
-```
-
-Test:
-
-```bash
-dotnet test
-```
-
-End-to-end package validation lives in the sibling `@tsonic/nodejs` repo:
-
-```bash
-cd ../nodejs
-npm run selftest
-```
-
-The `@tsonic/nodejs` package is generated from the compiled assembly via **tsbindgen**.
-
-## License
-
-MIT
