@@ -67,3 +67,15 @@ import { http } from "@tsonic/nodejs/nodejs.Http.js";
 - `@tsonic/nodejs` provides Node-style APIs (e.g. `fs`, `path`, `crypto`, `http`).
 
 You can enable either or both in a project.
+
+## Runtime contracts
+
+The CLR implementation preserves the package contracts exposed through
+`@tsonic/nodejs`:
+
+- public integer APIs keep their integer carriers
+- HTTP server/client wrappers stay compatible with the Node-style request and
+  response types
+- `crypto` key APIs use `KeyObject`-centered overloads for key creation,
+  signing, and verification
+- timers and immediates dispatch without depending on JavaScript engine globals
