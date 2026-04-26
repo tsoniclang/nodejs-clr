@@ -4,6 +4,16 @@
 
 It is Node-inspired (familiar ergonomics), but it is **not** Node.js itself and it is **not an exact replica** of the Node standard library.
 
+The runtime keeps public contracts stable for Tsonic callers:
+
+- integer-backed APIs stay integer-backed where the TypeScript surface declares
+  `int` or `long`
+- HTTP request/response wrappers expose Node-style fields over ASP.NET Core
+  primitives
+- `crypto` key generation and signing helpers use deterministic CLR key object
+  handling
+- timers and immediates dispatch through managed scheduler primitives
+
 ## For Tsonic Users
 
 Install and enable the bindings package:

@@ -1,6 +1,6 @@
 # Node.js API Verification Tools
 
-This directory now has one verification path only.
+This directory has one verification path.
 
 ## Command
 
@@ -45,4 +45,5 @@ It does **not** fail merely because Node coverage is incomplete. Coverage gaps a
 
 ## Publish gate
 
-`../nodejs/scripts/selftest.sh` now runs this verifier before runtime tests and end-to-end consumer tests. That makes API-shape regressions publish-blocking.
+`../nodejs/scripts/selftest.sh` runs this verifier before runtime tests and
+end-to-end consumer tests. That makes API-shape regressions publish-blocking.
